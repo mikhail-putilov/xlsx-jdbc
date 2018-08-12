@@ -1,9 +1,9 @@
 package ru.innopolis.mputilov.sql.db_impl;
 
-import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
-public class PrimaryKey<T extends Serializable> {
+public abstract class PrimaryKey<T> implements Comparable<PrimaryKey<T>> {
     private final T key;
 
     public PrimaryKey(T key) {
