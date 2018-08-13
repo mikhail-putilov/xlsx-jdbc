@@ -10,7 +10,7 @@ import java.net.URL;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static ru.innopolis.mputilov.TableMatchers.matchesTable;
-import static ru.innopolis.mputilov.sql.builder.StatementBuilder.select;
+import static ru.innopolis.mputilov.sql.builder.ExpressionBuilder.select;
 
 public class TableTest {
     /**

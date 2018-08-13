@@ -12,14 +12,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Getter
-public class StatementBuilder {
-    private final static Function<String, String[]> splitByDot = s -> s.split("\\.");
+public class ExpressionBuilder {
+    private static final Function<String, String[]> splitByDot = s -> s.split("\\.");
     private List<SelectAliasPair> select = new ArrayList<>();
     private List<TableAliasPair> tables = new ArrayList<>();
     private List<WhereEqPair> where = new ArrayList<>();
     private List<JoinConditionAliasPair> joinConditions = new ArrayList<>();
 
-    private StatementBuilder(String[] select) {
+    private ExpressionBuilder(String[] select) {
         Arrays.stream(select)
                 .map(splitByDot)
                 .map(split -> new SelectAliasPair(split[0], split[1]))
@@ -27,7 +27,7 @@ public class StatementBuilder {
     }
 
     public static FromStep select(String... select) {
-        StatementBuilder sql = new StatementBuilder(select);
+        ExpressionBuilder sql = new ExpressionBuilder(select);
         return sql.new FromStep();
     }
 
@@ -63,7 +63,7 @@ public class StatementBuilder {
         }
 
         public WhereOrJoin alias(String alias) {
-            StatementBuilder.this.tables.add(new TableAliasPair(alias, from));
+            ExpressionBuilder.this.tables.add(new TableAliasPair(alias, from));
             return new WhereOrJoin();
         }
     }
@@ -76,7 +76,7 @@ public class StatementBuilder {
 
     public class TerminalStep {
         public StatementModel build(DataBase db) {
-            return new StatementModel(StatementBuilder.this, db);
+            return new StatementModel(ExpressionBuilder.this, db);
         }
     }
 
@@ -88,7 +88,7 @@ public class StatementBuilder {
         }
 
         public JoinOnStep alias(String alias) {
-            StatementBuilder.this.tables.add(new TableAliasPair(alias, join));
+            ExpressionBuilder.this.tables.add(new TableAliasPair(alias, join));
             return new JoinOnStep();
         }
     }
@@ -132,7 +132,7 @@ public class StatementBuilder {
         }
 
         public WhereOrJoin eq(String whereEq) {
-            StatementBuilder.this.where.add(new WhereEqPair(where, whereEq));
+            ExpressionBuilder.this.where.add(new WhereEqPair(where, whereEq));
             return new WhereOrJoin();
         }
     }

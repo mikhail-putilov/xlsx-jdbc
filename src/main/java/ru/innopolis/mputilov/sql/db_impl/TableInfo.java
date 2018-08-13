@@ -3,7 +3,7 @@ package ru.innopolis.mputilov.sql.db_impl;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import ru.innopolis.mputilov.sql.builder.StatementBuilder;
+import ru.innopolis.mputilov.sql.builder.ExpressionBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,17 +12,17 @@ public class TableInfo {
     private static final String FORGOTTEN_MAP_ERROR_MESSAGE = "The map 'indexesOfKeyColumns' must be set before trying to put raw tuples from xls";
 
     @Getter
-    private final StatementBuilder.TableAliasPair tableNameOrAlias;
+    private final ExpressionBuilder.TableAliasPair tableNameOrAlias;
     @Getter(AccessLevel.PACKAGE)
-    private final List<StatementBuilder.SelectAliasPair> columnsFromSelect;
+    private final List<ExpressionBuilder.SelectAliasPair> columnsFromSelect;
     @Getter(AccessLevel.PACKAGE)
-    private final List<StatementBuilder.JoinConditionAliasPair> columnsFromJoin;
+    private final List<ExpressionBuilder.JoinConditionAliasPair> columnsFromJoin;
     private Table backingTable;
     private List<Integer> indexesOfKeyColumns = new ArrayList<>();
 
-    TableInfo(StatementBuilder.TableAliasPair tableNameOrAlias,
-                     List<StatementBuilder.SelectAliasPair> columnsFromSelect,
-                     List<StatementBuilder.JoinConditionAliasPair> columnsFromJoin) {
+    TableInfo(ExpressionBuilder.TableAliasPair tableNameOrAlias,
+                     List<ExpressionBuilder.SelectAliasPair> columnsFromSelect,
+                     List<ExpressionBuilder.JoinConditionAliasPair> columnsFromJoin) {
         this.tableNameOrAlias = tableNameOrAlias;
         this.columnsFromSelect = columnsFromSelect;
         this.columnsFromJoin = columnsFromJoin;
@@ -68,12 +68,12 @@ public class TableInfo {
                 .add(getTableNameOrAlias().toString())
                 .add(rightTable.getTableNameOrAlias().toString())
                 .toString();
-        StatementBuilder.TableAliasPair joinedId = new StatementBuilder.TableAliasPair(null, joinedTableName);
+        ExpressionBuilder.TableAliasPair joinedId = new ExpressionBuilder.TableAliasPair(null, joinedTableName);
 
-        List<StatementBuilder.SelectAliasPair> joinedColumnsFromSelect = new ArrayList<>(columnsFromSelect);
+        List<ExpressionBuilder.SelectAliasPair> joinedColumnsFromSelect = new ArrayList<>(columnsFromSelect);
         joinedColumnsFromSelect.addAll(rightTable.getColumnsFromSelect());
 
-        ArrayList<StatementBuilder.JoinConditionAliasPair> joinedColumnsFromJoin2 = new ArrayList<>(columnsFromJoin);
+        ArrayList<ExpressionBuilder.JoinConditionAliasPair> joinedColumnsFromJoin2 = new ArrayList<>(columnsFromJoin);
         joinedColumnsFromJoin2.addAll(rightTable.getColumnsFromJoin());
 
         TableInfo tableInfo = new TableInfo(joinedId, joinedColumnsFromSelect, joinedColumnsFromJoin2);
@@ -85,7 +85,7 @@ public class TableInfo {
         Objects.requireNonNull(nameToIndexInXlsx, "indexesOfKeyColumns map cannot be constructed when given argument is null");
 
         columnsFromJoin.stream()
-                .map(StatementBuilder.JoinConditionAliasPair::getColumn)
+                .map(ExpressionBuilder.JoinConditionAliasPair::getColumn)
                 .map(nameToIndexInXlsx::get)
                 .collect(Collectors.toCollection(() -> indexesOfKeyColumns));
 
