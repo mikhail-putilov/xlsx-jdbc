@@ -33,10 +33,10 @@ public class StatementModel {
                 .filter(s -> s.getAlias().equals(alias))
                 .collect(Collectors.toList());
 
-        List<StatementBuilder.JoinConditionAliasPair> columnsFromJoinClause2 = dataHolder.getJoinConditions().stream()
+        List<StatementBuilder.JoinConditionAliasPair> columnsFromJoin = dataHolder.getJoinConditions().stream()
                 .filter(s -> s.getAlias().equals(alias))
                 .collect(Collectors.toList());
 
-        return db.setBackingTable(new TableInfo(tableNameOrAlias, columnsFromSelect, columnsFromJoinClause2));
+        return db.setBackingTable(new TableInfo(tableNameOrAlias, columnsFromSelect, columnsFromJoin));
     }
 }

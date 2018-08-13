@@ -1,6 +1,5 @@
 package ru.innopolis.mputilov.sql.builder;
 
-import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import ru.innopolis.mputilov.sql.db_impl.DataBase;
@@ -14,8 +13,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public class StatementBuilder {
-    @Getter(AccessLevel.PRIVATE)
-    private final Function<String, String[]> splitByDot = s -> s.split("\\.");
+    private final static Function<String, String[]> splitByDot = s -> s.split("\\.");
     private List<SelectAliasPair> select = new ArrayList<>();
     private List<TableAliasPair> tables = new ArrayList<>();
     private List<WhereEqPair> where = new ArrayList<>();
@@ -57,16 +55,10 @@ public class StatementBuilder {
         final String column;
     }
 
-    @Data
-    public static final class EqAliasPair {
-        final String alias;
-        final String eq;
-    }
-
     public class AliasStepAfterFrom {
         private String from;
 
-        public AliasStepAfterFrom(String from) {
+        AliasStepAfterFrom(String from) {
             this.from = from;
         }
 
@@ -91,7 +83,7 @@ public class StatementBuilder {
     public class AliasStepAfterJoin {
         private String join;
 
-        public AliasStepAfterJoin(String join) {
+        AliasStepAfterJoin(String join) {
             this.join = join;
         }
 
