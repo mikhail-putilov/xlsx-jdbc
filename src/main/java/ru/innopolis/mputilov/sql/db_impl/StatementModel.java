@@ -17,20 +17,12 @@ public class StatementModel {
     }
 
     public boolean isJoined() {
-        return dataHolder.getJoin() != null;
-    }
-
-    public String getFromTableName() {
-        return dataHolder.getFrom().getTableName();
-    }
-
-    public List<StatementBuilder.SelectAliasPair> getColumns() {
-        return dataHolder.getSelect();
+        return dataHolder.getTables().size() > 1 && !dataHolder.getJoinConditions().isEmpty();
     }
 
     public List<TableInfo> getTableInfosWithBackingTable() {
-        StatementBuilder.TableAliasPair firstTable = dataHolder.getFrom();
-        StatementBuilder.TableAliasPair secondTable = dataHolder.getJoin();
+        StatementBuilder.TableAliasPair firstTable = dataHolder.getTables().get(0);
+        StatementBuilder.TableAliasPair secondTable = dataHolder.getTables().get(1);
         return Lists.newArrayList(createTableInfoForAlias(firstTable), createTableInfoForAlias(secondTable));
     }
 
@@ -41,14 +33,10 @@ public class StatementModel {
                 .filter(s -> s.getAlias().equals(alias))
                 .collect(Collectors.toList());
 
-        List<StatementBuilder.EqAliasPair> columnsFromJoinClause = dataHolder.getJoinEq().stream()
+        List<StatementBuilder.JoinConditionAliasPair> columnsFromJoinClause2 = dataHolder.getJoinConditions().stream()
                 .filter(s -> s.getAlias().equals(alias))
                 .collect(Collectors.toList());
 
-        List<StatementBuilder.OnAliasPair> columnsFromJoinClause2 = dataHolder.getJoinOn().stream()
-                .filter(s -> s.getAlias().equals(alias))
-                .collect(Collectors.toList());
-
-        return db.setBackingTable(new TableInfo(tableNameOrAlias, columnsFromSelect, columnsFromJoinClause, columnsFromJoinClause2));
+        return db.setBackingTable(new TableInfo(tableNameOrAlias, columnsFromSelect, columnsFromJoinClause2));
     }
 }

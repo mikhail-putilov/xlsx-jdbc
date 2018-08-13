@@ -1,5 +1,6 @@
 package ru.innopolis.mputilov.sql.builder;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import ru.innopolis.mputilov.sql.db_impl.DataBase;
@@ -13,19 +14,18 @@ import java.util.stream.Collectors;
 
 @Getter
 public class StatementBuilder {
-    private List<SelectAliasPair> select;
-    private TableAliasPair from;
-    private List<WhereEqPair> where = new ArrayList<>();
-    private TableAliasPair join;
-    private List<OnAliasPair> joinOn = new ArrayList<>();
-    private List<EqAliasPair> joinEq = new ArrayList<>();
+    @Getter(AccessLevel.PRIVATE)
     private final Function<String, String[]> splitByDot = s -> s.split("\\.");
+    private List<SelectAliasPair> select = new ArrayList<>();
+    private List<TableAliasPair> tables = new ArrayList<>();
+    private List<WhereEqPair> where = new ArrayList<>();
+    private List<JoinConditionAliasPair> joinConditions = new ArrayList<>();
 
     private StatementBuilder(String[] select) {
-        this.select = Arrays.stream(select)
+        Arrays.stream(select)
                 .map(splitByDot)
                 .map(split -> new SelectAliasPair(split[0], split[1]))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> this.select));
     }
 
     public static FromStep select(String... select) {
@@ -52,9 +52,9 @@ public class StatementBuilder {
     }
 
     @Data
-    public static final class OnAliasPair {
+    public static final class JoinConditionAliasPair {
         final String alias;
-        final String on;
+        final String column;
     }
 
     @Data
@@ -71,9 +71,7 @@ public class StatementBuilder {
         }
 
         public WhereOrJoin alias(String alias) {
-            if (from != null) {
-                StatementBuilder.this.from = new TableAliasPair(alias, from);
-            }
+            StatementBuilder.this.tables.add(new TableAliasPair(alias, from));
             return new WhereOrJoin();
         }
     }
@@ -98,7 +96,7 @@ public class StatementBuilder {
         }
 
         public JoinOnStep alias(String alias) {
-            StatementBuilder.this.join = new TableAliasPair(alias, join);
+            StatementBuilder.this.tables.add(new TableAliasPair(alias, join));
             return new JoinOnStep();
         }
     }
@@ -116,20 +114,20 @@ public class StatementBuilder {
     public class JoinOnStep {
 
         public JoinEqStep on(String... on) {
-            StatementBuilder.this.joinOn = Arrays.stream(on)
+            Arrays.stream(on)
                     .map(splitByDot)
-                    .map(split -> new OnAliasPair(split[0], split[1]))
-                    .collect(Collectors.toList());
+                    .map(split -> new JoinConditionAliasPair(split[0], split[1]))
+                    .collect(Collectors.toCollection(() -> joinConditions));
             return new JoinEqStep();
         }
     }
 
     public class JoinEqStep {
         public WhereOrJoin eq(String... eq) {
-            StatementBuilder.this.joinEq = Arrays.stream(eq)
+            Arrays.stream(eq)
                     .map(splitByDot)
-                    .map(split -> new EqAliasPair(split[0], split[1]))
-                    .collect(Collectors.toList());
+                    .map(split -> new JoinConditionAliasPair(split[0], split[1]))
+                    .collect(Collectors.toCollection(() -> joinConditions));
             return new WhereOrJoin();
         }
     }

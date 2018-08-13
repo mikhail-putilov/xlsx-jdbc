@@ -16,23 +16,19 @@ public class TableInfo {
     @Getter(AccessLevel.PACKAGE)
     private final List<StatementBuilder.SelectAliasPair> columnsFromSelect;
     @Getter(AccessLevel.PACKAGE)
-    private final List<StatementBuilder.EqAliasPair> columnsFromJoinClause;
-    @Getter(AccessLevel.PACKAGE)
-    private final List<StatementBuilder.OnAliasPair> columnsFromJoinClause2;
+    private final List<StatementBuilder.JoinConditionAliasPair> columnsFromJoinClause2;
     private Table backingTable;
-    private List<Integer> indexesOfKeyColumns;
+    private List<Integer> indexesOfKeyColumns = new ArrayList<>();
 
-    public TableInfo(StatementBuilder.TableAliasPair tableNameOrAlias, List<StatementBuilder.SelectAliasPair> columnsFromSelect, List<StatementBuilder.EqAliasPair> columnsFromJoinClause, List<StatementBuilder.OnAliasPair> columnsFromJoinClause2) {
+    public TableInfo(StatementBuilder.TableAliasPair tableNameOrAlias, List<StatementBuilder.SelectAliasPair> columnsFromSelect, List<StatementBuilder.JoinConditionAliasPair> columnsFromJoinClause2) {
         this.tableNameOrAlias = tableNameOrAlias;
         this.columnsFromSelect = columnsFromSelect;
-        this.columnsFromJoinClause = columnsFromJoinClause;
         this.columnsFromJoinClause2 = columnsFromJoinClause2;
     }
 
     public Set<String> getInterestedColumns() {
-        Set<String> names = new LinkedHashSet<>(columnsFromJoinClause.size() + columnsFromJoinClause.size() + columnsFromJoinClause2.size());
-        columnsFromJoinClause.forEach(p -> names.add(p.getEq()));
-        columnsFromJoinClause2.forEach(p -> names.add(p.getOn()));
+        Set<String> names = new LinkedHashSet<>(columnsFromJoinClause2.size());
+        columnsFromJoinClause2.forEach(p -> names.add(p.getColumn()));
         columnsFromSelect.forEach(p -> names.add(p.getSelect()));
 
         return names;
@@ -75,13 +71,10 @@ public class TableInfo {
         List<StatementBuilder.SelectAliasPair> joinedColumnsFromSelect = new ArrayList<>(columnsFromSelect);
         joinedColumnsFromSelect.addAll(rightTable.getColumnsFromSelect());
 
-        ArrayList<StatementBuilder.EqAliasPair> joinedColumnsFromJoin = new ArrayList<>(columnsFromJoinClause);
-        joinedColumnsFromJoin.addAll(rightTable.getColumnsFromJoinClause());
-
-        ArrayList<StatementBuilder.OnAliasPair> joinedColumnsFromJoin2 = new ArrayList<>(columnsFromJoinClause2);
+        ArrayList<StatementBuilder.JoinConditionAliasPair> joinedColumnsFromJoin2 = new ArrayList<>(columnsFromJoinClause2);
         joinedColumnsFromJoin2.addAll(rightTable.getColumnsFromJoinClause2());
 
-        TableInfo tableInfo = new TableInfo(joinedId, joinedColumnsFromSelect, joinedColumnsFromJoin, joinedColumnsFromJoin2);
+        TableInfo tableInfo = new TableInfo(joinedId, joinedColumnsFromSelect, joinedColumnsFromJoin2);
         tableInfo.setBackingTable(joined);
         return tableInfo;
     }
@@ -89,15 +82,10 @@ public class TableInfo {
     public void setNameToIndexMap(Map<String, Integer> nameToIndexInXlsx) {
         Objects.requireNonNull(nameToIndexInXlsx, "indexesOfKeyColumns map cannot be constructed when given argument is null");
 
-        indexesOfKeyColumns = columnsFromJoinClause.stream()
-                .map(StatementBuilder.EqAliasPair::getEq)
+        columnsFromJoinClause2.stream()
+                .map(StatementBuilder.JoinConditionAliasPair::getColumn)
                 .map(nameToIndexInXlsx::get)
-                .collect(Collectors.toList());
-        List<Integer> joinOn = columnsFromJoinClause2.stream()
-                .map(StatementBuilder.OnAliasPair::getOn)
-                .map(nameToIndexInXlsx::get)
-                .collect(Collectors.toList());
-        indexesOfKeyColumns.addAll(joinOn);
+                .collect(Collectors.toCollection(() -> indexesOfKeyColumns));
 
         if (indexesOfKeyColumns.stream().anyMatch(Objects::isNull)) {
             throw new IllegalStateException("column indexes for a key are not found in xls");

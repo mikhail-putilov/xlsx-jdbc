@@ -46,6 +46,7 @@ public class DataBase {
 
     /**
      * Retrieves existing table from cache or creates new one. Sets it to given tableInfo
+     *
      * @param tableInfo id of desirable table
      * @return tableInfo with set backing table
      */
