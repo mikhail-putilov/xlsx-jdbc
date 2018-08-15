@@ -1,10 +1,15 @@
 package ru.innopolis.mputilov.sql.db_impl;
 
 import java.util.List;
+import java.util.function.Function;
 
 public class CompoundStringPrimaryKey extends PrimaryKey<List<String>> {
     public CompoundStringPrimaryKey(List<String> key) {
         super(key);
+    }
+
+    public static CompoundStringPrimaryKey of(Function<List<String>, List<String>> keyExtractor, List<String> tuple) {
+        return new CompoundStringPrimaryKey(keyExtractor.apply(tuple));
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import lombok.SneakyThrows;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import ru.innopolis.mputilov.sql.builder.ExpressionBuilder;
+import ru.innopolis.mputilov.sql.builder.TableAliasPair;
 import ru.innopolis.mputilov.sql.event.ConnectionClosedEvent;
 import ru.innopolis.mputilov.sql.jdbc.XlsConnection;
 import ru.innopolis.mputilov.sql.jdbc.XlsConnectionFactory;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class DataBase {
     private final XlsConnectionFactory xlsConnectionFactory;
     private final List<XlsConnection> openedConnections = new ArrayList<>();
-    private final Map<ExpressionBuilder.TableAliasPair, Table> tableCache = new LinkedHashMap<>();
+    private final Map<TableAliasPair, Table> tableCache = new LinkedHashMap<>();
 
     @Inject
     DataBase(EventBus eventBus, XlsConnectionFactory xlsConnectionFactory) {
@@ -51,7 +51,7 @@ public class DataBase {
      * @return tableInfo with set backing table
      */
     public TableInfo setBackingTable(TableInfo tableInfo) {
-        ExpressionBuilder.TableAliasPair id = tableInfo.getTableNameOrAlias();
+        TableAliasPair id = tableInfo.getTableNameOrAlias();
         Table table = tableCache.get(id);
         if (table == null) {
             table = new Table();

@@ -2,6 +2,7 @@ package ru.innopolis.mputilov.sql.db_impl;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 public abstract class PrimaryKey<T> implements Comparable<PrimaryKey<T>> {
     private final T key;

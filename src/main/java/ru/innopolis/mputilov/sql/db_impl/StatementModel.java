@@ -2,6 +2,7 @@ package ru.innopolis.mputilov.sql.db_impl;
 
 import com.google.common.collect.Lists;
 import ru.innopolis.mputilov.sql.builder.ExpressionBuilder;
+import ru.innopolis.mputilov.sql.builder.TableAliasPair;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,12 +22,12 @@ public class StatementModel {
     }
 
     public List<TableInfo> getTableInfosWithBackingTable() {
-        ExpressionBuilder.TableAliasPair firstTable = dataHolder.getTables().get(0);
-        ExpressionBuilder.TableAliasPair secondTable = dataHolder.getTables().get(1);
+        TableAliasPair firstTable = dataHolder.getTables().get(0);
+        TableAliasPair secondTable = dataHolder.getTables().get(1);
         return Lists.newArrayList(createTableInfoForAlias(firstTable), createTableInfoForAlias(secondTable));
     }
 
-    private TableInfo createTableInfoForAlias(ExpressionBuilder.TableAliasPair tableNameOrAlias) {
+    private TableInfo createTableInfoForAlias(TableAliasPair tableNameOrAlias) {
         String alias = tableNameOrAlias.getAlias();
 
         List<ExpressionBuilder.SelectAliasPair> columnsFromSelect = dataHolder.getSelect().stream()

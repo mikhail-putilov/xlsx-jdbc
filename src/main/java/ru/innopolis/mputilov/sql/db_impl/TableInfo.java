@@ -4,6 +4,7 @@ package ru.innopolis.mputilov.sql.db_impl;
 import lombok.AccessLevel;
 import lombok.Getter;
 import ru.innopolis.mputilov.sql.builder.ExpressionBuilder;
+import ru.innopolis.mputilov.sql.builder.TableAliasPair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,7 +13,7 @@ public class TableInfo {
     private static final String FORGOTTEN_MAP_ERROR_MESSAGE = "The map 'indexesOfKeyColumns' must be set before trying to put raw tuples from xls";
 
     @Getter
-    private final ExpressionBuilder.TableAliasPair tableNameOrAlias;
+    private final TableAliasPair tableNameOrAlias;
     @Getter(AccessLevel.PACKAGE)
     private final List<ExpressionBuilder.SelectAliasPair> columnsFromSelect;
     @Getter(AccessLevel.PACKAGE)
@@ -20,7 +21,7 @@ public class TableInfo {
     private Table backingTable;
     private List<Integer> indexesOfKeyColumns = new ArrayList<>();
 
-    TableInfo(ExpressionBuilder.TableAliasPair tableNameOrAlias,
+    TableInfo(TableAliasPair tableNameOrAlias,
                      List<ExpressionBuilder.SelectAliasPair> columnsFromSelect,
                      List<ExpressionBuilder.JoinConditionAliasPair> columnsFromJoin) {
         this.tableNameOrAlias = tableNameOrAlias;
@@ -68,7 +69,7 @@ public class TableInfo {
                 .add(getTableNameOrAlias().toString())
                 .add(rightTable.getTableNameOrAlias().toString())
                 .toString();
-        ExpressionBuilder.TableAliasPair joinedId = new ExpressionBuilder.TableAliasPair(null, joinedTableName);
+        TableAliasPair joinedId = new TableAliasPair(null, joinedTableName);
 
         List<ExpressionBuilder.SelectAliasPair> joinedColumnsFromSelect = new ArrayList<>(columnsFromSelect);
         joinedColumnsFromSelect.addAll(rightTable.getColumnsFromSelect());
