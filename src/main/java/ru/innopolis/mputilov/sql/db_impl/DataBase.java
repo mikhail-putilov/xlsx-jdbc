@@ -54,7 +54,7 @@ public class DataBase {
         TableAliasPair id = tableInfo.getTableNameOrAlias();
         Table table = tableCache.get(id);
         if (table == null) {
-            table = new Table();
+            table = new Table(id.getAlias());
             tableCache.put(id, table);
         }
         tableInfo.setBackingTable(table);

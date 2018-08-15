@@ -27,26 +27,6 @@ public class ExpressionBuilder {
                 .collect(Collectors.toCollection(() -> this.select));
     }
 
-    public static void main(String[] args) {
-        Expression<Table> exp = new SqlExpression(
-                new SelectExpression(
-                        new ColumnAliasPair("t1", "col1"),
-                        new ColumnAliasPair("t1", "col2"),
-                        new ColumnAliasPair("t1", "col3"),
-                        new ColumnAliasPair("t2", "col5")),
-                new JoinEqExpression(
-                        new TableExpression(new TableAliasPair("t1", "table1")),
-                        new TableExpression(new TableAliasPair("t2", "table2")),
-                        new TuplePredicateExpression(
-                                new ColumnAliasPair("t1", "col1"),
-                                new ColumnAliasPair("t2", "col2"))),
-                new TuplePredicateExpression(
-                        new ColumnAliasPair("t1", "col1"),
-                        new StaticColumn(5)));
-        Context ctx = new EvaluationContext();
-        Table joinedResult = exp.eval(ctx);
-    }
-
     public static FromStep select(String... select) {
         ExpressionBuilder sql = new ExpressionBuilder(select);
         return sql.new FromStep();

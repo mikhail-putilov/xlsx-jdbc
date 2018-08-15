@@ -24,4 +24,9 @@ public class JoinEqExpression implements Expression<Table> {
 
         return lhs.join(rhs, predicate.getLhsKeyExtractor(), predicate.getRhsKeyExtractor());
     }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visitJoinEqExpression(this);
+    }
 }

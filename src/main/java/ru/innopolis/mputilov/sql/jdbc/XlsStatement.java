@@ -3,7 +3,7 @@ package ru.innopolis.mputilov.sql.jdbc;
 import com.google.common.collect.Iterables;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.poi.ss.usermodel.*;
-import ru.innopolis.mputilov.sql.builder.ExpressionBuilder;
+import ru.innopolis.mputilov.sql.builder.*;
 import ru.innopolis.mputilov.sql.db_impl.DataBase;
 import ru.innopolis.mputilov.sql.db_impl.StatementModel;
 import ru.innopolis.mputilov.sql.db_impl.Table;
@@ -28,6 +28,18 @@ public class XlsStatement {
                  DataBase db) {
         this.workbook = workbook;
         this.db = db;
+    }
+
+    public XlsResultSet executeQuery(Expression<Table> expression) {
+        EvaluationContext evaluationContext = new EvaluationContext();
+        Visitor hoister = new Hoister(evaluationContext);
+        expression.accept(hoister);
+
+        Visitor populator = new XlsPopulator(evaluationContext);
+        expression.accept(populator);
+
+        Table resultTable = expression.eval(evaluationContext);
+        return resultTable.getResultSet();
     }
 
     public XlsResultSet executeQuery(ExpressionBuilder.TerminalStep terminalStep) {

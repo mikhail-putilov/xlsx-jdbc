@@ -1,6 +1,6 @@
 package ru.innopolis.mputilov.sql.builder;
 
-interface Column {
+public interface Column {
     String getName();
 
     String getTableAlias();

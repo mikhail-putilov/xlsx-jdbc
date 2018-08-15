@@ -1,5 +1,7 @@
 package ru.innopolis.mputilov.sql.builder;
 
-interface Expression<T> {
+public interface Expression<T> {
     T eval(Context ctx);
+
+    void accept(Visitor visitor);
 }

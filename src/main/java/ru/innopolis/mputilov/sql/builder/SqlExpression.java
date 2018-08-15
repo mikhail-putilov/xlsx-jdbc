@@ -27,5 +27,10 @@ public class SqlExpression implements Expression<Table> {
         return ctx.getResult();
     }
 
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visitSqlExpression(this);
+    }
+
 
 }

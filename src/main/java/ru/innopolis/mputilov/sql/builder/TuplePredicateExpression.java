@@ -34,4 +34,9 @@ public class TuplePredicateExpression implements Expression<Boolean> {
         List<String> rightKey = rhsKeyExtractor.apply(rhsTuple);
         return leftKey.equals(rightKey);
     }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visitTuplePredicateExpression(this);
+    }
 }
