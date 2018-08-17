@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.Getter;
 import ru.innopolis.mputilov.sql.db_impl.DataBase;
 import ru.innopolis.mputilov.sql.db_impl.StatementModel;
-import ru.innopolis.mputilov.sql.db_impl.Table;
 
 import java.util.ArrayList;
 import java.util.Arrays;

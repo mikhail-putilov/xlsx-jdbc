@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class XlsPopulator implements Visitor {
-    private EvaluationContext evaluationContext;
+    private Context evaluationContext;
     private Workbook workbook;
 
-    public XlsPopulator(EvaluationContext evaluationContext, Workbook workbook) {
+    public XlsPopulator(Context evaluationContext, Workbook workbook) {
         this.evaluationContext = evaluationContext;
         this.workbook = workbook;
     }

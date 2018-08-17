@@ -23,6 +23,7 @@ public class XlsStatement {
     private final Workbook workbook;
     private final DataBase db;
     private StatementModel statement;
+
     @Inject
     XlsStatement(@Assisted Workbook workbook,
                  DataBase db) {
@@ -31,15 +32,12 @@ public class XlsStatement {
     }
 
     public XlsResultSet executeQuery(Expression<Table> expression) {
-        EvaluationContext evaluationContext = new EvaluationContext();
+        Context evaluationContext = new EvaluationContext();
         Visitor hoister = new Hoister(evaluationContext);
         expression.accept(hoister);
 
         Visitor populator = new XlsPopulator(evaluationContext, workbook);
         expression.accept(populator);
-
-        Visitor keyExtractorPopulator = new KeyExtractorPopulator(evaluationContext);
-        expression.accept(keyExtractorPopulator);
 
         Table resultTable = expression.eval(evaluationContext);
         return resultTable.getResultSet();

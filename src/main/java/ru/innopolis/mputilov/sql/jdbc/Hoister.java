@@ -6,9 +6,9 @@ import ru.innopolis.mputilov.sql.builder.*;
  * Hoist definition of columns from whole sql expression and fill context with that data
  */
 public class Hoister implements Visitor {
-    private EvaluationContext evaluationContext;
+    private Context evaluationContext;
 
-    public Hoister(EvaluationContext evaluationContext) {
+    public Hoister(Context evaluationContext) {
         this.evaluationContext = evaluationContext;
     }
 

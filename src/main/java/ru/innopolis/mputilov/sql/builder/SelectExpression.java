@@ -11,10 +11,6 @@ public class SelectExpression implements Expression<Columns> {
         this.columns = new Columns(column);
     }
 
-    public SelectExpression(Columns columns) {
-        this.columns = columns;
-    }
-
     @Override
     public Columns eval(Context ctx) {
         return columns;

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.innopolis.mputilov.sql.builder.Columns;
 import ru.innopolis.mputilov.sql.builder.TableAliasPair;
+import ru.innopolis.mputilov.sql.builder.TuplePredicateExpression;
 import ru.innopolis.mputilov.sql.jdbc.XlsResultSet;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class Table {
         rawTuples.add(rawTuple);
     }
 
-    public Table join(Table other, String joinedTableAlias) {
+    private Table probing(Table other, String joinedTableAlias) {
         if (data.isEmpty()) {
             throw new IllegalStateException("Cannot join raw tables, use #put(PrimaryKey, List<String>) method");
         }
@@ -91,7 +92,7 @@ public class Table {
         data.put(key, tuple);
     }
 
-    public Table join(Table rhs, String joinedTableAlias, Function<List<String>, List<String>> lhsKeyExtractor, Function<List<String>, List<String>> rhsKeyExtractor) {
+    public Table join(Table rhs, String joinedTableAlias, TuplePredicateExpression predicate) {
         if (isReccurent()) {
             throw new UnsupportedOperationException("cannot join reccurent table " + tableName);
         }
@@ -105,16 +106,16 @@ public class Table {
             throw new IllegalStateException("Rhs table is empty, nothing to join");
         }
         if (isRawTuplesAvailable()) {
-            rehash(lhsKeyExtractor);
+            rehash(predicate.getLhsKeyExtractor());
         } else {
             throw new IllegalStateException("Lhs table does not have raw tuples to rehash");
         }
         if (rhs.isRawTuplesAvailable()) {
-            rhs.rehash(rhsKeyExtractor);
+            rhs.rehash(predicate.getRhsKeyExtractor());
         } else {
             throw new IllegalStateException("Rhs table does not have raw tuple to rehash");
         }
-        return this.join(rhs, joinedTableAlias);
+        return this.probing(rhs, joinedTableAlias);
     }
 
     private void rehash(Function<List<String>, List<String>> keyExtractor) {
