@@ -18,15 +18,15 @@ public class TableTest {
      * select [columns]
      * from [table]
      * where [criteria]
-     *
+     * <p>
      * table := <table1> [join <table2> on <criteria>]
-     *
-     *
+     * <p>
+     * <p>
      * gather info about table N: which columns needed to load, under which key to put data for the next processing
      * load table N  and put it under the key in <on> clause
-     *
+     * <p>
      * do same for table N-1
-     *
+     * <p>
      * join and result put in raw tuples or under key in <on> clause
      */
     @Test

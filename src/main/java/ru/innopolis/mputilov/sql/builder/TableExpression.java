@@ -1,18 +1,19 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.innopolis.mputilov.sql.db_impl.Table;
 
 @Setter
 @Getter
+@RequiredArgsConstructor
 public class TableExpression implements Expression<Table> {
-    private TableAliasPair tableAliasPair;
-    private Table table;
+    private final TableAliasPair tableAliasPair;
+    private final Table table;
 
     public TableExpression(TableAliasPair tableAliasPair) {
-        this.tableAliasPair = tableAliasPair;
-        this.table = new Table(tableAliasPair);
+        this(tableAliasPair, new Table(tableAliasPair));
     }
 
     @Override
