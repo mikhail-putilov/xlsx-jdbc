@@ -1,9 +1,11 @@
 package ru.innopolis.mputilov.sql.builder;
 
+import lombok.Getter;
 import ru.innopolis.mputilov.sql.db_impl.Table;
 
 import java.util.UUID;
 
+@Getter
 public class SqlExpression implements Expression<Table> {
     private String id = UUID.randomUUID().toString();
     private Expression<Table> from;
@@ -22,14 +24,17 @@ public class SqlExpression implements Expression<Table> {
         Columns columns = this.columns.eval(ctx);
         // set in context projected columns for this particular sql expression (relation)
         ctx.addProjectionColumns(id, columns);
-        from.eval(ctx);
-        where.eval(ctx);
-        return ctx.getResult();
+
+//        where.eval(ctx);
+        return from.eval(ctx);
     }
 
     @Override
     public void accept(Visitor visitor) {
         visitor.visitSqlExpression(this);
+        columns.accept(visitor);
+        from.accept(visitor);
+        where.accept(visitor);
     }
 
 

@@ -1,10 +1,9 @@
 package ru.innopolis.mputilov.sql.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Columns {
     private List<Column> columns;
@@ -27,7 +26,20 @@ public class Columns {
         return new Columns(copy);
     }
 
+    public Columns combineDistinct(Columns cols) {
+        Set<Column> copy = new HashSet<>(this.columns);
+        copy.addAll(cols.columns);
+        return new Columns(new ArrayList<>(copy));
+    }
+
     public void add(Column c) {
+        columns.add(c);
+    }
+
+    public void addDistinct(Column c) {
+        if (columns.contains(c)) {
+            return;
+        }
         columns.add(c);
     }
 
@@ -38,6 +50,22 @@ public class Columns {
     }
 
     public List<String> getAllAliases() {
-        return columns.stream().map(Column::getTableAlias).collect(Collectors.toList());
+        return columns.stream().filter(Objects::nonNull).map(Column::getTableAlias).collect(Collectors.toList());
+    }
+
+    public boolean containsTableName(String tableName) {
+        return columns.stream().anyMatch(c -> c.getName().equals(tableName));
+    }
+
+    public int size() {
+        return columns.size();
+    }
+
+    public Stream<Column> stream() {
+        return columns.stream();
+    }
+
+    public int getIndexOf(Column column) {
+        return columns.indexOf(column);
     }
 }

@@ -17,6 +17,7 @@ public class SqlExpressionTest {
                 new JoinEqExpression(
                         new TableExpression(new TableAliasPair("t1", "table1")),
                         new TableExpression(new TableAliasPair("t2", "table2")),
+                        "j",
                         new TuplePredicateExpression(
                                 new ColumnAliasPair("t1", "col1"),
                                 new ColumnAliasPair("t2", "col2"))),

@@ -16,5 +16,7 @@ interface Context {
 
     void addProjectionColumn(String tableAlias, Column column);
 
+    void addProjectionColumn(Column column);
+
     Columns getProjectedColumnsFor(String tableAlias);
 }

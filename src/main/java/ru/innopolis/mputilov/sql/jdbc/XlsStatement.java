@@ -35,8 +35,11 @@ public class XlsStatement {
         Visitor hoister = new Hoister(evaluationContext);
         expression.accept(hoister);
 
-        Visitor populator = new XlsPopulator(evaluationContext);
+        Visitor populator = new XlsPopulator(evaluationContext, workbook);
         expression.accept(populator);
+
+        Visitor keyExtractorPopulator = new KeyExtractorPopulator(evaluationContext);
+        expression.accept(keyExtractorPopulator);
 
         Table resultTable = expression.eval(evaluationContext);
         return resultTable.getResultSet();

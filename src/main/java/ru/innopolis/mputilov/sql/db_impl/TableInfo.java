@@ -62,24 +62,25 @@ public class TableInfo {
     }
 
     public TableInfo join(TableInfo rightTable) {
-        Table joined = this.backingTable.join(rightTable.getBackingTable());
-
-        String joinedTableName = new StringJoiner("_")
-                .add("Joined")
-                .add(getTableNameOrAlias().toString())
-                .add(rightTable.getTableNameOrAlias().toString())
-                .toString();
-        TableAliasPair joinedId = new TableAliasPair(null, joinedTableName);
-
-        List<ExpressionBuilder.SelectAliasPair> joinedColumnsFromSelect = new ArrayList<>(columnsFromSelect);
-        joinedColumnsFromSelect.addAll(rightTable.getColumnsFromSelect());
-
-        ArrayList<ExpressionBuilder.JoinConditionAliasPair> joinedColumnsFromJoin2 = new ArrayList<>(columnsFromJoin);
-        joinedColumnsFromJoin2.addAll(rightTable.getColumnsFromJoin());
-
-        TableInfo tableInfo = new TableInfo(joinedId, joinedColumnsFromSelect, joinedColumnsFromJoin2);
-        tableInfo.setBackingTable(joined);
-        return tableInfo;
+//        Table joined = this.backingTable.join(rightTable.getBackingTable());
+//
+//        String joinedTableName = new StringJoiner("_")
+//                .add("Joined")
+//                .add(getTableNameOrAlias().toString())
+//                .add(rightTable.getTableNameOrAlias().toString())
+//                .toString();
+//        TableAliasPair joinedId = new TableAliasPair(null, joinedTableName);
+//
+//        List<ExpressionBuilder.SelectAliasPair> joinedColumnsFromSelect = new ArrayList<>(columnsFromSelect);
+//        joinedColumnsFromSelect.addAll(rightTable.getColumnsFromSelect());
+//
+//        ArrayList<ExpressionBuilder.JoinConditionAliasPair> joinedColumnsFromJoin2 = new ArrayList<>(columnsFromJoin);
+//        joinedColumnsFromJoin2.addAll(rightTable.getColumnsFromJoin());
+//
+//        TableInfo tableInfo = new TableInfo(joinedId, joinedColumnsFromSelect, joinedColumnsFromJoin2);
+//        tableInfo.setBackingTable(joined);
+//        return tableInfo;
+        return null;
     }
 
     public void setNameToIndexMap(Map<String, Integer> nameToIndexInXlsx) {

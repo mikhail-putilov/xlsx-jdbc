@@ -12,6 +12,7 @@ public class TableExpression implements Expression<Table> {
 
     public TableExpression(TableAliasPair tableAliasPair) {
         this.tableAliasPair = tableAliasPair;
+        this.table = new Table(tableAliasPair);
     }
 
     @Override

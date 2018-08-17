@@ -4,7 +4,9 @@ import com.google.common.base.Joiner;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import ru.innopolis.mputilov.sql.builder.Columns;
+import ru.innopolis.mputilov.sql.builder.TableAliasPair;
 import ru.innopolis.mputilov.sql.jdbc.XlsResultSet;
 
 import java.util.ArrayList;
@@ -13,14 +15,21 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 
+@Getter
 @RequiredArgsConstructor
 public class Table {
-    @Getter
-    private final String id;
+    private final String tableName;
+    private final String tableAlias;
+    @Setter
     private Columns columns;
     @Getter(AccessLevel.PACKAGE)
     private Map<PrimaryKey, List<String>> data = new TreeMap<>();
     private List<List<String>> rawTuples = new ArrayList<>();
+
+    public Table(TableAliasPair tableAliasPair) {
+        this.tableName = tableAliasPair.getTableName();
+        this.tableAlias = tableAliasPair.getAlias();
+    }
 
     public boolean isReccurent() {
         return false;
@@ -34,11 +43,11 @@ public class Table {
         return data.isEmpty() && rawTuples.isEmpty();
     }
 
-    private void addRawTuple(List<String> rawTuple) {
+    public void addRawTuple(List<String> rawTuple) {
         rawTuples.add(rawTuple);
     }
 
-    public Table join(Table other) {
+    public Table join(Table other, String joinedTableAlias) {
         if (data.isEmpty()) {
             throw new IllegalStateException("Cannot join raw tables, use #put(PrimaryKey, List<String>) method");
         }
@@ -49,13 +58,13 @@ public class Table {
         if (getData().size() < other.getData().size()) {
             small = getData();
             big = other.getData();
-            joined = new Table(Joiner.on("_").join("Joined", id, other.id));
+            joined = new Table(Joiner.on("_").join("Joined", tableName, other.tableName), joinedTableAlias);
             joined.columns = columns.combine(other.columns);
         } else {
             isLeftSmall = false;
             small = other.getData();
             big = getData();
-            joined = new Table(Joiner.on("_").join("Joined", other.id, id));
+            joined = new Table(Joiner.on("_").join("Joined", other.tableName, tableName), joinedTableAlias);
             joined.columns = other.columns.combine(columns);
         }
         final boolean isLeftSmallFinal = isLeftSmall;
@@ -82,12 +91,12 @@ public class Table {
         data.put(key, tuple);
     }
 
-    public Table join(Table rhs, Function<List<String>, List<String>> lhsKeyExtractor, Function<List<String>, List<String>> rhsKeyExtractor) {
+    public Table join(Table rhs, String joinedTableAlias, Function<List<String>, List<String>> lhsKeyExtractor, Function<List<String>, List<String>> rhsKeyExtractor) {
         if (isReccurent()) {
-            throw new UnsupportedOperationException("cannot join reccurent table " + getId());
+            throw new UnsupportedOperationException("cannot join reccurent table " + tableName);
         }
         if (rhs.isReccurent()) {
-            throw new UnsupportedOperationException("cannot join reccurent table" + rhs.getId());
+            throw new UnsupportedOperationException("cannot join reccurent table" + rhs.tableName);
         }
         if (isEmpty()) {
             throw new IllegalStateException("Lhs table is empty, nothing to join");
@@ -105,7 +114,7 @@ public class Table {
         } else {
             throw new IllegalStateException("Rhs table does not have raw tuple to rehash");
         }
-        return this.join(rhs);
+        return this.join(rhs, joinedTableAlias);
     }
 
     private void rehash(Function<List<String>, List<String>> keyExtractor) {

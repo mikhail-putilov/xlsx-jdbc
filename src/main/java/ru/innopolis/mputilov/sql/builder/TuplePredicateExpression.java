@@ -9,8 +9,8 @@ import java.util.function.Function;
 public class TuplePredicateExpression implements Expression<Boolean> {
     private Function<List<String>, List<String>> lhsKeyExtractor;
     private Function<List<String>, List<String>> rhsKeyExtractor;
-    private Column lhs;
-    private Column rhs;
+    private Column lhsColumn;
+    private Column rhsColumn;
 
     public void setLhsKeyExtractor(Function<List<String>, List<String>> lhsKeyExtractor) {
         this.lhsKeyExtractor = lhsKeyExtractor;
@@ -20,10 +20,10 @@ public class TuplePredicateExpression implements Expression<Boolean> {
         this.rhsKeyExtractor = rhsKeyExtractor;
     }
 
-    public TuplePredicateExpression(Column lhs,
-                                    Column rhs) {
-        this.lhs = lhs;
-        this.rhs = rhs;
+    public TuplePredicateExpression(Column lhsColumn,
+                                    Column rhsColumn) {
+        this.lhsColumn = lhsColumn;
+        this.rhsColumn = rhsColumn;
     }
 
     @Override

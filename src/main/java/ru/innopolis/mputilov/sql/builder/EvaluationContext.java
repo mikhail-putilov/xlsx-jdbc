@@ -10,7 +10,7 @@ public class EvaluationContext implements Context {
     /**
      * id of expression -> projected columns
      */
-    private Map<String, Columns> projectionInfo = Maps.newHashMap();
+    private Map<String, Columns> projectionInfo = Maps.newLinkedHashMap();
 
     @Override
     public List<String> getLhsTuple() {
@@ -31,16 +31,22 @@ public class EvaluationContext implements Context {
     public void addProjectionColumns(String tableAlias, Columns columns) {
         Columns exists = projectionInfo.get(tableAlias);
         if (exists != null) {
-            exists.combine(columns);
+            exists.combineDistinct(columns);
         } else {
             projectionInfo.put(tableAlias, columns);
         }
     }
 
     @Override
+    public void addProjectionColumn(Column column) {
+        projectionInfo.putIfAbsent(column.getTableAlias(), new Columns());
+        projectionInfo.get(column.getTableAlias()).addDistinct(column);
+    }
+
+    @Override
     public void addProjectionColumn(String tableAlias, Column column) {
         projectionInfo.putIfAbsent(tableAlias, new Columns());
-        projectionInfo.get(tableAlias).add(column);
+        projectionInfo.get(tableAlias).addDistinct(column);
     }
 
     @Override
