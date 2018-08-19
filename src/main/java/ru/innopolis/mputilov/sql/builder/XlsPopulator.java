@@ -3,6 +3,7 @@ package ru.innopolis.mputilov.sql.builder;
 import com.google.common.collect.Iterables;
 import org.apache.poi.ss.usermodel.*;
 import ru.innopolis.mputilov.sql.db_impl.Table;
+import ru.innopolis.mputilov.sql.db_impl.Tuple;
 
 import java.util.List;
 import java.util.Map;
@@ -60,10 +61,10 @@ public class XlsPopulator implements Visitor {
         for (Row row : Iterables.skip(sheet, 1)) {
             row.forEach(c -> c.setCellType(CellType.STRING));
             // preserve order of columns
-            List<String> tuple = projectedColumns.stream()
+            List<Object> tuple = projectedColumns.stream()
                     .map(columnName -> row.getCell(nameToIndexInXls.get(columnName)).getStringCellValue())
                     .collect(Collectors.toList());
-            table.addRawTuple(tuple);
+            table.addRawTuple(new Tuple(tuple));
         }
     }
 }

@@ -24,8 +24,8 @@ public class Table {
     @Setter
     private Columns columns;
     @Getter(AccessLevel.PACKAGE)
-    private Map<PrimaryKey, List<String>> data = new TreeMap<>();
-    private List<List<String>> rawTuples = new ArrayList<>();
+    private Map<Tuple, Tuple> data = new TreeMap<>();
+    private List<Tuple> rawTuples = new ArrayList<>();
 
     public Table(TableAliasPair tableAliasPair) {
         this.tableName = tableAliasPair.getTableName();
@@ -44,7 +44,7 @@ public class Table {
         return data.isEmpty() && rawTuples.isEmpty();
     }
 
-    public void addRawTuple(List<String> rawTuple) {
+    public void addRawTuple(Tuple rawTuple) {
         rawTuples.add(rawTuple);
     }
 
@@ -52,8 +52,8 @@ public class Table {
         if (data.isEmpty()) {
             throw new IllegalStateException("Cannot join raw tables, use #put(PrimaryKey, List<String>) method");
         }
-        Map<PrimaryKey, List<String>> small;
-        Map<PrimaryKey, List<String>> big;
+        Map<Tuple, Tuple> small;
+        Map<Tuple, Tuple> big;
         Table joined;
         boolean isLeftSmall = true;
         if (getData().size() < other.getData().size()) {
@@ -70,14 +70,12 @@ public class Table {
         }
         final boolean isLeftSmallFinal = isLeftSmall;
         small.forEach((key, tupleFromSmall) -> {
-            List<String> tupleFromBig = big.get(key);
-            List<String> joinedTuple = new ArrayList<>(tupleFromSmall.size() + tupleFromBig.size());
+            Tuple tupleFromBig = big.get(key);
+            Tuple joinedTuple;
             if (isLeftSmallFinal) {
-                joinedTuple.addAll(tupleFromSmall);
-                joinedTuple.addAll(tupleFromBig);
+                joinedTuple = Tuple.of(tupleFromSmall, tupleFromBig);
             } else {
-                joinedTuple.addAll(tupleFromBig);
-                joinedTuple.addAll(tupleFromSmall);
+                joinedTuple = Tuple.of(tupleFromBig, tupleFromSmall);
             }
             joined.addRawTuple(joinedTuple);
         });
@@ -88,7 +86,7 @@ public class Table {
         return new XlsResultSet(rawTuples);
     }
 
-    public void put(PrimaryKey key, List<String> tuple) {
+    public void put(Tuple key, Tuple tuple) {
         data.put(key, tuple);
     }
 
@@ -118,12 +116,12 @@ public class Table {
         return this.probing(rhs, joinedTableAlias);
     }
 
-    private void rehash(Function<List<String>, List<String>> keyExtractor) {
+    private void rehash(Function<Tuple, Tuple> keyExtractor) {
         if (!data.isEmpty()) {
             data.clear();
         }
         rawTuples.forEach(t -> {
-            data.put(CompoundStringPrimaryKey.of(keyExtractor, t), t);
+            data.put(keyExtractor.apply(t), t);
         });
     }
 }

@@ -1,14 +1,16 @@
 package ru.innopolis.mputilov;
 
-import com.google.common.collect.Lists;
+import ru.innopolis.mputilov.sql.db_impl.Tuple;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
 
-class TableBuilder implements Iterable<List<String>> {
-    private List<List<String>> rows = new ArrayList<>();
+import static java.util.Arrays.asList;
+
+class TableBuilder implements Iterable<Tuple> {
+    private List<Tuple> rows = new ArrayList<>();
 
     public static TableBuilder create() {
         return new TableBuilder();
@@ -20,17 +22,17 @@ class TableBuilder implements Iterable<List<String>> {
     }
 
     public TableBuilder row(String... cols) {
-        rows.add(Lists.newArrayList(cols));
+        rows.add(new Tuple(asList((Object[]) cols)));
         return this;
     }
 
     @Override
-    public Iterator<List<String>> iterator() {
+    public Iterator<Tuple> iterator() {
         return rows.iterator();
     }
 
     @Override
-    public Spliterator<List<String>> spliterator() {
+    public Spliterator<Tuple> spliterator() {
         return rows.spliterator();
     }
 }
