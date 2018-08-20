@@ -1,7 +1,10 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import com.google.common.collect.Iterables;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import org.apache.poi.ss.usermodel.*;
+import ru.innopolis.mputilov.sql.db_impl.DataBase;
 import ru.innopolis.mputilov.sql.db_impl.Table;
 import ru.innopolis.mputilov.sql.db_impl.Tuple;
 
@@ -12,10 +15,13 @@ import java.util.stream.StreamSupport;
 
 public class XlsPopulator implements Visitor {
     private Context evaluationContext;
+    private DataBase db;
     private Workbook workbook;
 
-    public XlsPopulator(Context evaluationContext, Workbook workbook) {
+    @Inject
+    XlsPopulator(@Assisted Context evaluationContext, @Assisted Workbook workbook, DataBase db) {
         this.evaluationContext = evaluationContext;
+        this.db = db;
         this.workbook = workbook;
     }
 
@@ -31,8 +37,9 @@ public class XlsPopulator implements Visitor {
 
     @Override
     public void visitTableExpression(TableExpression expression) {
+        expression.initTable(() -> db.getOrCreateTable(expression.getTableAliasPair()));
         Table table = expression.getTable();
-        populateTable(table);
+        table.populateTable(this::fromWorkbook);
     }
 
     @Override
@@ -46,7 +53,7 @@ public class XlsPopulator implements Visitor {
     }
 
 
-    private void populateTable(Table table) {
+    private void fromWorkbook(Table table) {
         Sheet sheet = workbook.getSheet(table.getTableName());
         Columns projectedColumns = evaluationContext.getProjectedColumnsFor(table.getTableAlias());
         table.setColumns(projectedColumns);

@@ -20,18 +20,18 @@ import java.util.Objects;
 public class XlsConnection implements AutoCloseable {
     private final URL filename;
     private final Workbook workbook;
-    private final XlsStatementFactory xlsStatementFactory;
     private final EventBus eventBus;
+    private final XlsPopulatorFactory xlsPopulatorFactory;
 
     @Inject
     public XlsConnection(@Assisted URL filename,
-                         @Assisted XSSFWorkbook workbook,
-                         XlsStatementFactory xlsStatementFactory,
-                         EventBus eventBus) {
+                         @Assisted Workbook workbook,
+                         EventBus eventBus,
+                         XlsPopulatorFactory xlsPopulatorFactory) {
         this.filename = filename;
         this.workbook = workbook;
-        this.xlsStatementFactory = xlsStatementFactory;
         this.eventBus = eventBus;
+        this.xlsPopulatorFactory = xlsPopulatorFactory;
     }
 
     @Override
@@ -47,14 +47,14 @@ public class XlsConnection implements AutoCloseable {
         return Objects.hash(filename.getPath());
     }
 
-    public XlsStatement createStatement() {
-        return xlsStatementFactory.create(workbook);
-    }
-
     @Override
     @SneakyThrows(IOException.class)
     public void close() {
         eventBus.post(new ConnectionClosedEvent(this));
         workbook.close();
+    }
+
+    public XlsStatement createStatement() {
+        return new XlsStatement(workbook, xlsPopulatorFactory);
     }
 }

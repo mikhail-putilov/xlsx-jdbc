@@ -5,15 +5,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.innopolis.mputilov.sql.db_impl.Table;
 
+import java.util.function.Supplier;
+
 @Setter
 @Getter
 @RequiredArgsConstructor
 public class TableExpression implements Expression<Table> {
     private final TableAliasPair tableAliasPair;
-    private final Table table;
+    private Table table;
 
-    public TableExpression(TableAliasPair tableAliasPair) {
-        this(tableAliasPair, new Table(tableAliasPair));
+    void initTable(Supplier<Table> supplier) {
+        if (table == null) {
+            table = supplier.get();
+        }
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Getter
@@ -27,7 +28,7 @@ public class Table {
     private Map<Tuple, Tuple> data = new TreeMap<>();
     private List<Tuple> rawTuples = new ArrayList<>();
 
-    public Table(TableAliasPair tableAliasPair) {
+    Table(TableAliasPair tableAliasPair) {
         this.tableName = tableAliasPair.getTableName();
         this.tableAlias = tableAliasPair.getAlias();
     }
@@ -35,6 +36,13 @@ public class Table {
     private boolean isReccurent() {
         // todo
         return false;
+    }
+
+    public void populateTable(Consumer<Table> consumer) {
+        if (isRawTuplesAvailable() || !data.isEmpty()) {
+            throw new IllegalStateException();
+        }
+        consumer.accept(this);
     }
 
     private boolean isRawTuplesAvailable() {
