@@ -10,13 +10,19 @@ import java.util.Objects;
 class TableMatchers extends TypeSafeMatcher<Iterable<Tuple>> {
 
     private TableBuilder expected;
-    private String reason;
-    public TableMatchers(TableBuilder expected) {
+    private String messageExpected;
+    private String messageActual;
+    private TableMatchers(TableBuilder expected) {
         this.expected = expected;
     }
 
-    public static TableMatchers matchesTable(TableBuilder tableBuilder) {
+    static TableMatchers matchesTable(TableBuilder tableBuilder) {
         return new TableMatchers(tableBuilder);
+    }
+
+    @Override
+    protected void describeMismatchSafely(Iterable<Tuple> item, Description mismatchDescription) {
+        mismatchDescription.appendText(messageActual);
     }
 
     @Override
@@ -28,12 +34,14 @@ class TableMatchers extends TypeSafeMatcher<Iterable<Tuple>> {
             Tuple expectedTuple = expectedIt.next();
             Tuple actualTuple = actualIt.next();
             if (expectedTuple.size() != actualTuple.size()) {
-                reason = String.format("%dth tuples have same sizes:\nExpected:\n%s\nActual:\n%s", j, expectedTuple, actualTuple);
+                messageExpected = String.format("%dth tuple is expected to be %d in size", j, expectedTuple.size());
+                messageActual = String.format("%dth tuple is %d in size", j, actualTuple.size());
                 return false;
             }
             for (int i = 0; i < expectedTuple.size(); i++) {
                 if (!Objects.equals(expectedTuple.get(i), actualTuple.get(i))) {
-                    reason = String.format("%dth tuples have same values at position %d.\nExpected:\n%s\nActual:\n%s", j, i, expectedTuple, actualTuple);
+                    messageExpected = String.format("%dth tuple, %d column is expected to be %s", j, i, expectedTuple.get(i));
+                    messageActual = String.format("%dth tuple, %d column is %s", j, i, actualTuple.get(i));
                     return false;
                 }
             }
@@ -44,6 +52,6 @@ class TableMatchers extends TypeSafeMatcher<Iterable<Tuple>> {
 
     @Override
     public void describeTo(Description description) {
-        description.appendText(reason);
+        description.appendText(messageExpected);
     }
 }

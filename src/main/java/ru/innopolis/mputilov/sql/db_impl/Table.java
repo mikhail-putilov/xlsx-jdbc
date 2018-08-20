@@ -32,7 +32,8 @@ public class Table {
         this.tableAlias = tableAliasPair.getAlias();
     }
 
-    public boolean isReccurent() {
+    private boolean isReccurent() {
+        // todo
         return false;
     }
 
@@ -50,32 +51,30 @@ public class Table {
 
     private Table probing(Table other, String joinedTableAlias) {
         if (data.isEmpty()) {
-            throw new IllegalStateException("Cannot join raw tables, use #put(PrimaryKey, List<String>) method");
+            throw new IllegalStateException("Cannot join raw tables");
         }
         Map<Tuple, Tuple> small;
         Map<Tuple, Tuple> big;
         Table joined;
-        boolean isLeftSmall = true;
-        if (getData().size() < other.getData().size()) {
+        boolean isLeftSmall = getData().size() < other.getData().size();
+        if (isLeftSmall) {
             small = getData();
             big = other.getData();
             joined = new Table(Joiner.on("_").join("Joined", tableName, other.tableName), joinedTableAlias);
             joined.columns = columns.combine(other.columns);
         } else {
-            isLeftSmall = false;
             small = other.getData();
             big = getData();
             joined = new Table(Joiner.on("_").join("Joined", other.tableName, tableName), joinedTableAlias);
             joined.columns = other.columns.combine(columns);
         }
-        final boolean isLeftSmallFinal = isLeftSmall;
-        small.forEach((key, tupleFromSmall) -> {
-            Tuple tupleFromBig = big.get(key);
+        small.forEach((key, smallTuple) -> {
+            Tuple bigTuple = big.get(key);
             Tuple joinedTuple;
-            if (isLeftSmallFinal) {
-                joinedTuple = Tuple.of(tupleFromSmall, tupleFromBig);
+            if (isLeftSmall) {
+                joinedTuple = Tuple.of(smallTuple, bigTuple);
             } else {
-                joinedTuple = Tuple.of(tupleFromBig, tupleFromSmall);
+                joinedTuple = Tuple.of(bigTuple, smallTuple);
             }
             joined.addRawTuple(joinedTuple);
         });
@@ -84,10 +83,6 @@ public class Table {
 
     public XlsResultSet getResultSet() {
         return new XlsResultSet(rawTuples);
-    }
-
-    public void put(Tuple key, Tuple tuple) {
-        data.put(key, tuple);
     }
 
     public Table join(Table rhs, String joinedTableAlias, TuplePredicateExpression predicate) {
@@ -120,8 +115,6 @@ public class Table {
         if (!data.isEmpty()) {
             data.clear();
         }
-        rawTuples.forEach(t -> {
-            data.put(keyExtractor.apply(t), t);
-        });
+        rawTuples.forEach(t -> data.put(keyExtractor.apply(t), t));
     }
 }

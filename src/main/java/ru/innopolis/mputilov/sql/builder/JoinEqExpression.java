@@ -22,9 +22,6 @@ public class JoinEqExpression implements Expression<Table> {
 
     @Override
     public Table eval(Context ctx) {
-        ctx.addProjectionColumn(predicate.getLhsColumn());
-        ctx.addProjectionColumn(predicate.getRhsColumn());
-
         Table lhs = this.lhs.eval(ctx);
         Table rhs = this.rhs.eval(ctx);
 
