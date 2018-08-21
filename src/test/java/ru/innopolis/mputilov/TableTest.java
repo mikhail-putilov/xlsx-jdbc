@@ -28,10 +28,10 @@ public class TableTest {
                         new TableExpression(new TableAliasPair("s1", "Sheet1")),
                         new TableExpression(new TableAliasPair("s2", "Sheet2")),
                         "j",
-                        new TuplePredicateExpression(
+                        new PredicateExpression(
                                 new ColumnAliasPair("s1", "col1"),
                                 new ColumnAliasPair("s2", "col5"))),
-                new TuplePredicateExpression(
+                new PredicateExpression(
                         new ColumnAliasPair("s1", "col1"),
                         new StaticColumn(5))));
         conn.close();

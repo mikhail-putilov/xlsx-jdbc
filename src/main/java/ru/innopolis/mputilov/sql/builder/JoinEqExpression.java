@@ -8,12 +8,12 @@ public class JoinEqExpression implements Expression<Table> {
     private Expression<Table> lhs;
     private Expression<Table> rhs;
     private String joinedTableAlias;
-    private TuplePredicateExpression predicate;
+    private PredicateExpression predicate;
 
     public JoinEqExpression(Expression<Table> lhs,
                             Expression<Table> rhs,
                             String joinedTableAlias,
-                            TuplePredicateExpression predicate) {
+                            PredicateExpression predicate) {
         this.lhs = lhs;
         this.rhs = rhs;
         this.joinedTableAlias = joinedTableAlias;

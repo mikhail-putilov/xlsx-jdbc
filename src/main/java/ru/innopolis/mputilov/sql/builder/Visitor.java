@@ -7,7 +7,7 @@ public interface Visitor {
 
     void visitTableExpression(TableExpression expression);
 
-    void visitTuplePredicateExpression(TuplePredicateExpression expression);
+    void visitTuplePredicateExpression(PredicateExpression expression);
 
     void visitSqlExpression(SqlExpression expression);
 }

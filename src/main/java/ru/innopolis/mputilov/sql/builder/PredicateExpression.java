@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public class TuplePredicateExpression implements Expression<Boolean> {
+public class PredicateExpression implements Expression<Boolean> {
     private final Column lhsColumn;
     private final Column rhsColumn;
     private Function<Tuple, Tuple> lhsKeyExtractor;

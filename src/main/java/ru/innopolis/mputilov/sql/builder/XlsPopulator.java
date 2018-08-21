@@ -43,7 +43,7 @@ public class XlsPopulator implements Visitor {
     }
 
     @Override
-    public void visitTuplePredicateExpression(TuplePredicateExpression expression) {
+    public void visitTuplePredicateExpression(PredicateExpression expression) {
 
     }
 

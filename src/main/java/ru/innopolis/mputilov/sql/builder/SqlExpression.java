@@ -5,15 +5,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.innopolis.mputilov.sql.db_impl.Table;
 
-import java.util.UUID;
-
 @Getter
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class SqlExpression implements Expression<Table> {
     private final Expression<Columns> columns;
     private final Expression<Table> from;
-    private final TuplePredicateExpression where;
+    private final PredicateExpression where;
     private TableAliasPair tableAliasPair;
 
     @Override

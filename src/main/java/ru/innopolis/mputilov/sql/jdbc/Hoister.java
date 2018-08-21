@@ -8,7 +8,7 @@ import ru.innopolis.mputilov.sql.builder.*;
 public class Hoister implements Visitor {
     private Context evaluationContext;
 
-    public Hoister(Context evaluationContext) {
+    Hoister(Context evaluationContext) {
         this.evaluationContext = evaluationContext;
     }
 
@@ -30,7 +30,7 @@ public class Hoister implements Visitor {
     }
 
     @Override
-    public void visitTuplePredicateExpression(TuplePredicateExpression expression) {
+    public void visitTuplePredicateExpression(PredicateExpression expression) {
         Column lhs = expression.getLhsColumn();
         Column rhs = expression.getRhsColumn();
         evaluationContext.addProjectionColumn(lhs);
