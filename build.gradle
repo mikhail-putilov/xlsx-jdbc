@@ -4,6 +4,10 @@ plugins {
 
 }
 
+tasks.withType(JavaCompile) {
+    options.incremental = true
+}
+
 group 'ru.innopolis.mputilov'
 version '0.1.0-SNAPSHOT'
 
