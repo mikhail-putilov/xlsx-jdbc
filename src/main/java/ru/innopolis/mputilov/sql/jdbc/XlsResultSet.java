@@ -1,29 +1,30 @@
 package ru.innopolis.mputilov.sql.jdbc;
 
+import ru.innopolis.mputilov.sql.db_impl.Tuple;
+
 import java.util.Iterator;
-import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-public class XlsResultSet implements Iterable<List<String>> {
-    private Iterable<List<String>> tuples;
+public class XlsResultSet implements Iterable<Tuple> {
+    private Iterable<Tuple> tuples;
 
-    public XlsResultSet(Iterable<List<String>> tuples) {
+    public XlsResultSet(Iterable<Tuple> tuples) {
         this.tuples = tuples;
     }
 
     @Override
-    public Iterator<List<String>> iterator() {
+    public Iterator<Tuple> iterator() {
         return tuples.iterator();
     }
 
     @Override
-    public void forEach(Consumer<? super List<String>> action) {
+    public void forEach(Consumer<? super Tuple> action) {
         tuples.forEach(action);
     }
 
     @Override
-    public Spliterator<List<String>> spliterator() {
+    public Spliterator<Tuple> spliterator() {
         return tuples.spliterator();
     }
 }

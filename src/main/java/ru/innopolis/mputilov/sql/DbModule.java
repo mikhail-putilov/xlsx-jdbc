@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import ru.innopolis.mputilov.sql.db_impl.DataBase;
 import ru.innopolis.mputilov.sql.jdbc.XlsConnectionFactory;
-import ru.innopolis.mputilov.sql.jdbc.XlsStatementFactory;
+import ru.innopolis.mputilov.sql.jdbc.XlsPopulatorFactory;
 
 public class DbModule extends AbstractModule {
     @Override
@@ -14,7 +14,7 @@ public class DbModule extends AbstractModule {
         bind(EventBus.class).toInstance(new EventBus("main"));
         bind(DataBase.class).in(Singleton.class);
         FactoryModuleBuilder factoryModuleBuilder = new FactoryModuleBuilder();
+        install(factoryModuleBuilder.build(XlsPopulatorFactory.class));
         install(factoryModuleBuilder.build(XlsConnectionFactory.class));
-        install(factoryModuleBuilder.build(XlsStatementFactory.class));
     }
 }

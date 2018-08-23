@@ -7,14 +7,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.innopolis.mputilov.sql.builder.Columns;
 import ru.innopolis.mputilov.sql.builder.TableAliasPair;
-import ru.innopolis.mputilov.sql.builder.TuplePredicateExpression;
+import ru.innopolis.mputilov.sql.builder.WhereExp;
 import ru.innopolis.mputilov.sql.jdbc.XlsResultSet;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
@@ -24,16 +26,24 @@ public class Table {
     @Setter
     private Columns columns;
     @Getter(AccessLevel.PACKAGE)
-    private Map<PrimaryKey, List<String>> data = new TreeMap<>();
-    private List<List<String>> rawTuples = new ArrayList<>();
+    private TreeMap<Tuple, Tuple> hashed = new TreeMap<>();
+    private List<Tuple> rawTuples = new ArrayList<>();
 
-    public Table(TableAliasPair tableAliasPair) {
+    Table(TableAliasPair tableAliasPair) {
         this.tableName = tableAliasPair.getTableName();
         this.tableAlias = tableAliasPair.getAlias();
     }
 
-    public boolean isReccurent() {
+    private boolean isReccurent() {
+        // todo
         return false;
+    }
+
+    public void populateTable(Consumer<Table> consumer) {
+        if (isRawTuplesAvailable() || !hashed.isEmpty()) {
+            throw new IllegalStateException();
+        }
+        consumer.accept(this);
     }
 
     private boolean isRawTuplesAvailable() {
@@ -41,44 +51,35 @@ public class Table {
     }
 
     private boolean isEmpty() {
-        return data.isEmpty() && rawTuples.isEmpty();
+        return hashed.isEmpty() && rawTuples.isEmpty();
     }
 
-    public void addRawTuple(List<String> rawTuple) {
+    public void addRawTuple(Tuple rawTuple) {
         rawTuples.add(rawTuple);
     }
 
     private Table probing(Table other, String joinedTableAlias) {
-        if (data.isEmpty()) {
-            throw new IllegalStateException("Cannot join raw tables, use #put(PrimaryKey, List<String>) method");
+        if (hashed.isEmpty()) {
+            throw new IllegalStateException("Cannot join raw tables");
         }
-        Map<PrimaryKey, List<String>> small;
-        Map<PrimaryKey, List<String>> big;
+        Map<Tuple, Tuple> small;
+        Map<Tuple, Tuple> big;
         Table joined;
-        boolean isLeftSmall = true;
-        if (getData().size() < other.getData().size()) {
-            small = getData();
-            big = other.getData();
+        boolean isLeftSmall = getHashed().size() < other.getHashed().size();
+        if (isLeftSmall) {
+            small = getHashed();
+            big = other.getHashed();
             joined = new Table(Joiner.on("_").join("Joined", tableName, other.tableName), joinedTableAlias);
             joined.columns = columns.combine(other.columns);
         } else {
-            isLeftSmall = false;
-            small = other.getData();
-            big = getData();
+            small = other.getHashed();
+            big = getHashed();
             joined = new Table(Joiner.on("_").join("Joined", other.tableName, tableName), joinedTableAlias);
             joined.columns = other.columns.combine(columns);
         }
-        final boolean isLeftSmallFinal = isLeftSmall;
-        small.forEach((key, tupleFromSmall) -> {
-            List<String> tupleFromBig = big.get(key);
-            List<String> joinedTuple = new ArrayList<>(tupleFromSmall.size() + tupleFromBig.size());
-            if (isLeftSmallFinal) {
-                joinedTuple.addAll(tupleFromSmall);
-                joinedTuple.addAll(tupleFromBig);
-            } else {
-                joinedTuple.addAll(tupleFromBig);
-                joinedTuple.addAll(tupleFromSmall);
-            }
+        small.forEach((key, smallTuple) -> {
+            Tuple bigTuple = big.get(key);
+            Tuple joinedTuple = Tuple.of(smallTuple, bigTuple);
             joined.addRawTuple(joinedTuple);
         });
         return joined;
@@ -88,11 +89,7 @@ public class Table {
         return new XlsResultSet(rawTuples);
     }
 
-    public void put(PrimaryKey key, List<String> tuple) {
-        data.put(key, tuple);
-    }
-
-    public Table join(Table rhs, String joinedTableAlias, TuplePredicateExpression predicate) {
+    public Table join(Table rhs, String joinedTableAlias, WhereExp predicate) {
         if (isReccurent()) {
             throw new UnsupportedOperationException("cannot join reccurent table " + tableName);
         }
@@ -118,12 +115,18 @@ public class Table {
         return this.probing(rhs, joinedTableAlias);
     }
 
-    private void rehash(Function<List<String>, List<String>> keyExtractor) {
-        if (!data.isEmpty()) {
-            data.clear();
+    private void rehash(Function<Tuple, Tuple> keyExtractor) {
+        if (!hashed.isEmpty()) {
+            hashed.clear();
         }
-        rawTuples.forEach(t -> {
-            data.put(CompoundStringPrimaryKey.of(keyExtractor, t), t);
-        });
+        rawTuples.forEach(t -> hashed.put(keyExtractor.apply(t), t));
+    }
+
+    public void removeIf(Predicate<Tuple> predicate) {
+        if (!hashed.isEmpty()) {
+            hashed.values().removeIf(predicate);
+        } else {
+            rawTuples.removeIf(predicate);
+        }
     }
 }

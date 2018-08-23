@@ -1,10 +1,17 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import com.google.common.collect.Maps;
+import lombok.Getter;
+import lombok.Setter;
+import ru.innopolis.mputilov.sql.db_impl.Table;
 
 import java.util.Map;
 
+@Getter
+@Setter
 public class EvaluationContext implements Context {
+    private ContextState currentContextState;
+    private Table currentProcessingTable;
     /**
      * id of expression -> projected columns
      */
@@ -21,9 +28,9 @@ public class EvaluationContext implements Context {
     }
 
     @Override
-    public void addProjectionColumn(Column column) {
-        projectionInfo.putIfAbsent(column.getTableAlias(), new Columns());
-        projectionInfo.get(column.getTableAlias()).addDistinct(column);
+    public void addProjectionColumn(ColumnExp columnExp) {
+        projectionInfo.putIfAbsent(columnExp.getTableAlias(), new Columns());
+        projectionInfo.get(columnExp.getTableAlias()).addDistinct(columnExp);
     }
 
     @Override

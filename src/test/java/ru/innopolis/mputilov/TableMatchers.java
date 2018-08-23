@@ -2,39 +2,56 @@ package ru.innopolis.mputilov;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
+import ru.innopolis.mputilov.sql.db_impl.Tuple;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 
-class TableMatchers extends TypeSafeMatcher<Iterable<List<String>>> {
+import static java.lang.String.format;
 
-    public static TableMatchers matchesTable(TableBuilder tableBuilder) {
-        return new TableMatchers(tableBuilder);
-    }
+class TableMatchers extends TypeSafeMatcher<Iterable<Tuple>> {
 
     private TableBuilder expected;
-    private String reason;
-
-    public TableMatchers(TableBuilder expected) {
+    private String messageExpected;
+    private String messageActual;
+    private TableMatchers(TableBuilder expected) {
         this.expected = expected;
     }
 
+    static TableMatchers matchesTable(TableBuilder tableBuilder) {
+        return new TableMatchers(tableBuilder);
+    }
+
     @Override
-    protected boolean matchesSafely(Iterable<List<String>> actual) {
-        Iterator<List<String>> expectedIt = this.expected.iterator();
-        Iterator<List<String>> actualIt = actual.iterator();
+    protected void describeMismatchSafely(Iterable<Tuple> item, Description mismatchDescription) {
+        mismatchDescription.appendText(messageActual);
+    }
+
+    @Override
+    protected boolean matchesSafely(Iterable<Tuple> actual) {
+        Iterator<Tuple> expectedIt = this.expected.iterator();
+        Iterator<Tuple> actualIt = actual.iterator();
+        if (!expectedIt.hasNext()) {
+            return !actualIt.hasNext();
+        }
+        if (!actualIt.hasNext()) {
+            messageActual = "actual table is empty";
+            messageExpected = format("first row must be %s", expectedIt.next());
+            return false;
+        }
         int j = 0;
         while (expectedIt.hasNext() || actualIt.hasNext()) {
-            List<String> expectedTuple = expectedIt.next();
-            List<String> actualTuple = actualIt.next();
+            Tuple expectedTuple = expectedIt.next();
+            Tuple actualTuple = actualIt.next();
             if (expectedTuple.size() != actualTuple.size()) {
-                reason = String.format("%dth tuples have same sizes:\nExpected:\n%s\nActual:\n%s", j, expectedTuple, actualTuple);
+                messageExpected = format("%dth tuple is expected to be %d in size", j, expectedTuple.size());
+                messageActual = format("%dth tuple is %d in size", j, actualTuple.size());
                 return false;
             }
             for (int i = 0; i < expectedTuple.size(); i++) {
                 if (!Objects.equals(expectedTuple.get(i), actualTuple.get(i))) {
-                    reason = String.format("%dth tuples have same values at position %d.\nExpected:\n%s\nActual:\n%s", j, i, expectedTuple, actualTuple);
+                    messageExpected = format("%dth tuple, %d column is expected to be %s", j, i, expectedTuple.get(i));
+                    messageActual = format("%dth tuple, %d column is %s", j, i, actualTuple.get(i));
                     return false;
                 }
             }
@@ -45,6 +62,6 @@ class TableMatchers extends TypeSafeMatcher<Iterable<List<String>>> {
 
     @Override
     public void describeTo(Description description) {
-        description.appendText(reason);
+        description.appendText(messageExpected);
     }
 }

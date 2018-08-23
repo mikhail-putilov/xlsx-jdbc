@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DataBase {
+public class DataBase implements TableFactory {
     private final XlsConnectionFactory xlsConnectionFactory;
     private final List<XlsConnection> openedConnections = new ArrayList<>();
     private final Map<TableAliasPair, Table> tableCache = new LinkedHashMap<>();
@@ -46,18 +46,9 @@ public class DataBase {
 
     /**
      * Retrieves existing table from cache or creates new one. Sets it to given tableInfo
-     *
-     * @param tableInfo id of desirable table
-     * @return tableInfo with set backing table
      */
-    public TableInfo setBackingTable(TableInfo tableInfo) {
-        TableAliasPair id = tableInfo.getTableNameOrAlias();
-        Table table = tableCache.get(id);
-        if (table == null) {
-            table = new Table(id.getAlias(), null);
-            tableCache.put(id, table);
-        }
-        tableInfo.setBackingTable(table);
-        return tableInfo;
+    @Override
+    public Table getOrCreateTable(TableAliasPair id) {
+        return tableCache.computeIfAbsent(id, _id -> new Table(id));
     }
 }
