@@ -13,32 +13,32 @@ public class Hoister implements Visitor {
     }
 
     @Override
-    public void visitJoinEqExpression(JoinEqExpression expression) {
+    public void visitJoinEqExpression(JoinEq expression) {
         //no-op
     }
 
     @Override
-    public void visitSelectExpression(SelectExpression expression) {
+    public void visitSelectExpression(SelectExp expression) {
         Columns columns = expression.getColumns();
         columns.getAllAliases()
                 .forEach(tableAlias -> evaluationContext.addProjectionColumns(tableAlias, columns.getColumnsForTableWithAlias(tableAlias)));
     }
 
     @Override
-    public void visitTableExpression(TableExpression expression) {
+    public void visitTableExpression(TableExp expression) {
         // no-op
     }
 
     @Override
-    public void visitTuplePredicateExpression(PredicateExpression expression) {
-        Column lhs = expression.getLhsColumn();
-        Column rhs = expression.getRhsColumn();
+    public void visitTuplePredicateExpression(WhereExp expression) {
+        ColumnExp lhs = expression.getLhsColumnExp();
+        ColumnExp rhs = expression.getRhsColumnExp();
         evaluationContext.addProjectionColumn(lhs);
         evaluationContext.addProjectionColumn(rhs);
     }
 
     @Override
-    public void visitSqlExpression(SqlExpression expression) {
+    public void visitSqlExpression(SqlExp expression) {
         //no-op
     }
 }

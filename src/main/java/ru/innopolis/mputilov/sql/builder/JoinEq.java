@@ -3,17 +3,20 @@ package ru.innopolis.mputilov.sql.builder;
 import lombok.Getter;
 import ru.innopolis.mputilov.sql.db_impl.Table;
 
+import java.util.UUID;
+
 @Getter
-public class JoinEqExpression implements Expression<Table> {
+public class JoinEq extends TableExp {
     private Expression<Table> lhs;
     private Expression<Table> rhs;
     private String joinedTableAlias;
-    private PredicateExpression predicate;
+    private WhereExp predicate;
 
-    public JoinEqExpression(Expression<Table> lhs,
-                            Expression<Table> rhs,
-                            String joinedTableAlias,
-                            PredicateExpression predicate) {
+    public JoinEq(Expression<Table> lhs,
+                  Expression<Table> rhs,
+                  String joinedTableAlias,
+                  WhereExp predicate) {
+        super(new TableAliasPair(joinedTableAlias, "Joined-" + UUID.randomUUID().toString()));
         this.lhs = lhs;
         this.rhs = rhs;
         this.joinedTableAlias = joinedTableAlias;
@@ -28,7 +31,8 @@ public class JoinEqExpression implements Expression<Table> {
         predicate.setRhsKeyExtractor(rhs);
         predicate.setLhsKeyExtractor(lhs);
 
-        return lhs.join(rhs, joinedTableAlias, predicate);
+        table = lhs.join(rhs, joinedTableAlias, predicate);
+        return table;
     }
 
     @Override

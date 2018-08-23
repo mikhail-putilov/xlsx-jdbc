@@ -9,10 +9,13 @@ import java.util.function.Supplier;
 
 @Setter
 @Getter
-@RequiredArgsConstructor
-public class TableExpression implements Expression<Table> {
-    private final TableAliasPair tableAliasPair;
-    private Table table;
+public class TableExp implements Expression<Table> {
+    protected TableAliasPair tableAliasPair;
+    protected Table table;
+
+    public TableExp(TableAliasPair tableAliasPair) {
+        this.tableAliasPair = tableAliasPair;
+    }
 
     void initTable(Supplier<Table> supplier) {
         if (table == null) {

@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.innopolis.mputilov.sql.builder.Columns;
 import ru.innopolis.mputilov.sql.builder.TableAliasPair;
-import ru.innopolis.mputilov.sql.builder.PredicateExpression;
+import ru.innopolis.mputilov.sql.builder.WhereExp;
 import ru.innopolis.mputilov.sql.jdbc.XlsResultSet;
 
 import java.util.ArrayList;
@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class Table {
     @Setter
     private Columns columns;
     @Getter(AccessLevel.PACKAGE)
-    private Map<Tuple, Tuple> hashed = new TreeMap<>();
+    private TreeMap<Tuple, Tuple> hashed = new TreeMap<>();
     private List<Tuple> rawTuples = new ArrayList<>();
 
     Table(TableAliasPair tableAliasPair) {
@@ -78,12 +79,7 @@ public class Table {
         }
         small.forEach((key, smallTuple) -> {
             Tuple bigTuple = big.get(key);
-            Tuple joinedTuple;
-            if (isLeftSmall) {
-                joinedTuple = Tuple.of(smallTuple, bigTuple);
-            } else {
-                joinedTuple = Tuple.of(bigTuple, smallTuple);
-            }
+            Tuple joinedTuple = Tuple.of(smallTuple, bigTuple);
             joined.addRawTuple(joinedTuple);
         });
         return joined;
@@ -93,7 +89,7 @@ public class Table {
         return new XlsResultSet(rawTuples);
     }
 
-    public Table join(Table rhs, String joinedTableAlias, PredicateExpression predicate) {
+    public Table join(Table rhs, String joinedTableAlias, WhereExp predicate) {
         if (isReccurent()) {
             throw new UnsupportedOperationException("cannot join reccurent table " + tableName);
         }
@@ -124,5 +120,13 @@ public class Table {
             hashed.clear();
         }
         rawTuples.forEach(t -> hashed.put(keyExtractor.apply(t), t));
+    }
+
+    public void removeIf(Predicate<Tuple> predicate) {
+        if (!hashed.isEmpty()) {
+            hashed.values().removeIf(predicate);
+        } else {
+            rawTuples.removeIf(predicate);
+        }
     }
 }

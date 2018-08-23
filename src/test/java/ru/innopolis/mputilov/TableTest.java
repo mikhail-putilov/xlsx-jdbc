@@ -1,6 +1,8 @@
 package ru.innopolis.mputilov;
 
 import com.google.common.io.Resources;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import ru.innopolis.mputilov.sql.builder.*;
 import ru.innopolis.mputilov.sql.jdbc.XlsConnection;
@@ -10,35 +12,102 @@ import ru.innopolis.mputilov.sql.jdbc.XlsResultSet;
 import java.net.URL;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static ru.innopolis.mputilov.TableBuilder.table;
 import static ru.innopolis.mputilov.TableMatchers.matchesTable;
+import static ru.innopolis.mputilov.sql.builder.Operation.EQ;
 
 public class TableTest {
-    @Test
-    public void trivial2() {
+
+    private XlsConnection conn;
+
+    @Before
+    public void setUp() {
         URL url = Resources.getResource("test.xlsx");
-        XlsConnection conn = XlsManager.getConnection(url);
-        XlsResultSet set = conn.createStatement().executeQuery(new SqlExpression(
-                new SelectExpression(
+        conn = XlsManager.getConnection(url);
+    }
+
+    @After
+    public void tearDown() {
+        conn.close();
+    }
+
+    @Test
+    public void trivialJoin() {
+        XlsResultSet set = conn.createStatement().executeQuery(new SqlExp(
+                new SelectExp(
                         new ColumnAliasPair("s1", "col1"),
                         new ColumnAliasPair("s1", "col2"),
                         new ColumnAliasPair("s1", "col3"),
                         new ColumnAliasPair("s2", "col5"),
                         new ColumnAliasPair("s2", "col6")),
-                new JoinEqExpression(
-                        new TableExpression(new TableAliasPair("s1", "Sheet1")),
-                        new TableExpression(new TableAliasPair("s2", "Sheet2")),
+                new JoinEq(
+                        new TableExp(new TableAliasPair("s1", "Sheet1")),
+                        new TableExp(new TableAliasPair("s2", "Sheet2")),
                         "j",
-                        new PredicateExpression(
+                        new WhereExp(
+                                EQ,
                                 new ColumnAliasPair("s1", "col1"),
                                 new ColumnAliasPair("s2", "col5"))),
-                new PredicateExpression(
-                        new ColumnAliasPair("s1", "col1"),
-                        new StaticColumn(5))));
-        conn.close();
-        assertThat(set, matchesTable(TableBuilder.create()
+                null,
+                null));
+        assertThat(set, matchesTable(table()
                 .row("1.0", "2.0", "3.0", "1.0", "bla")
                 .row("4.0", "5.0", "6.0", "4.0", "blabla")
                 .row("7.0", "8.0", "9.0", "7.0", "blablabla")
+        ));
+    }
+
+    @Test
+    public void trivialJoinAndWhere() {
+        XlsResultSet set = conn.createStatement().executeQuery(new SqlExp(
+                new SelectExp(
+                        new ColumnAliasPair("s1", "col1"),
+                        new ColumnAliasPair("s1", "col2"),
+                        new ColumnAliasPair("s1", "col3"),
+                        new ColumnAliasPair("s2", "col5"),
+                        new ColumnAliasPair("s2", "col6")),
+                new JoinEq(
+                        new TableExp(new TableAliasPair("s1", "Sheet1")),
+                        new TableExp(new TableAliasPair("s2", "Sheet2")),
+                        "j",
+                        new WhereExp(
+                                EQ,
+                                new ColumnAliasPair("s1", "col1"),
+                                new ColumnAliasPair("s2", "col5"))),
+                new WhereExp(
+                        EQ,
+                        new ColumnAliasPair("s1", "col1"),
+                        new StaticColumnExp("4.0")),
+                null));
+        assertThat(set, matchesTable(table()
+                .row("4.0", "5.0", "6.0", "4.0", "blabla")
+        ));
+    }
+
+    @Test
+    public void trivialReordering() {
+        XlsResultSet set = conn.createStatement().executeQuery(new SqlExp(
+                new SelectExp(
+                        new ColumnAliasPair("s1", "col3"),
+                        new ColumnAliasPair("s1", "col2"),
+                        new ColumnAliasPair("s2", "col5"),
+                        new ColumnAliasPair("s1", "col1"),
+                        new ColumnAliasPair("s2", "col6")),
+                new JoinEq(
+                        new TableExp(new TableAliasPair("s1", "Sheet1")),
+                        new TableExp(new TableAliasPair("s2", "Sheet2")),
+                        "j",
+                        new WhereExp(
+                                EQ,
+                                new ColumnAliasPair("s1", "col1"),
+                                new ColumnAliasPair("s2", "col5"))),
+                new WhereExp(
+                        EQ,
+                        new ColumnAliasPair("s1", "col1"),
+                        new StaticColumnExp("4.0")),
+                null));
+        assertThat(set, matchesTable(table()
+                .row("6.0", "5.0", "4.0", "4.0", "blabla")
         ));
     }
 

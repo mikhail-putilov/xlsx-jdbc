@@ -25,8 +25,12 @@ public class Tuple implements Comparable<Tuple> {
 
     }
 
-    public static Tuple of(Object tuple) {
-        return new Tuple(ImmutableList.of(tuple));
+    public static Tuple of(List<Object> multipleObj) {
+        return new Tuple(multipleObj);
+    }
+
+    public static Tuple of(Object oneObj) {
+        return new Tuple(ImmutableList.of(oneObj));
     }
 
     static Tuple of(Tuple left, Tuple right) {

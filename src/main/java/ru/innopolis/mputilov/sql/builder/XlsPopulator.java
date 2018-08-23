@@ -26,29 +26,29 @@ public class XlsPopulator implements Visitor {
     }
 
     @Override
-    public void visitJoinEqExpression(JoinEqExpression expression) {
+    public void visitJoinEqExpression(JoinEq expression) {
 
     }
 
     @Override
-    public void visitSelectExpression(SelectExpression expression) {
+    public void visitSelectExpression(SelectExp expression) {
 
     }
 
     @Override
-    public void visitTableExpression(TableExpression expression) {
+    public void visitTableExpression(TableExp expression) {
         expression.initTable(() -> db.getOrCreateTable(expression.getTableAliasPair()));
         Table table = expression.getTable();
         table.populateTable(this::fromWorkbook);
     }
 
     @Override
-    public void visitTuplePredicateExpression(PredicateExpression expression) {
+    public void visitTuplePredicateExpression(WhereExp expression) {
 
     }
 
     @Override
-    public void visitSqlExpression(SqlExpression expression) {
+    public void visitSqlExpression(SqlExp expression) {
 
     }
 
@@ -58,7 +58,7 @@ public class XlsPopulator implements Visitor {
         Columns projectedColumns = evaluationContext.getProjectedColumnsFor(table.getTableAlias());
         table.setColumns(projectedColumns);
 
-        Map<Column, Integer> nameToIndexInXls = StreamSupport.stream(sheet.getRow(0).spliterator(), false)
+        Map<ColumnExp, Integer> nameToIndexInXls = StreamSupport.stream(sheet.getRow(0).spliterator(), false)
                 .filter(cell -> projectedColumns.containsTableName(cell.getStringCellValue()))
                 .collect(Collectors.toMap(c -> new ColumnAliasPair(table.getTableAlias(), c.getStringCellValue()), Cell::getColumnIndex));
         if (projectedColumns.size() != nameToIndexInXls.size()) {

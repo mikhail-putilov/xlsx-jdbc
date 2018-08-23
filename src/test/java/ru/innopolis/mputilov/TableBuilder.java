@@ -12,7 +12,7 @@ import static java.util.Arrays.asList;
 class TableBuilder implements Iterable<Tuple> {
     private List<Tuple> rows = new ArrayList<>();
 
-    public static TableBuilder create() {
+    static TableBuilder table() {
         return new TableBuilder();
     }
 
@@ -21,11 +21,12 @@ class TableBuilder implements Iterable<Tuple> {
         return rows.toString();
     }
 
-    public TableBuilder row(String... cols) {
+    TableBuilder row(String... cols) {
         rows.add(new Tuple(asList((Object[]) cols)));
         return this;
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public Iterator<Tuple> iterator() {
         return rows.iterator();

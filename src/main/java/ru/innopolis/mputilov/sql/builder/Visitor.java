@@ -1,13 +1,13 @@
 package ru.innopolis.mputilov.sql.builder;
 
 public interface Visitor {
-    void visitJoinEqExpression(JoinEqExpression expression);
+    void visitJoinEqExpression(JoinEq expression);
 
-    void visitSelectExpression(SelectExpression expression);
+    void visitSelectExpression(SelectExp expression);
 
-    void visitTableExpression(TableExpression expression);
+    void visitTableExpression(TableExp expression);
 
-    void visitTuplePredicateExpression(PredicateExpression expression);
+    void visitTuplePredicateExpression(WhereExp expression);
 
-    void visitSqlExpression(SqlExpression expression);
+    void visitSqlExpression(SqlExp expression);
 }
