@@ -5,9 +5,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.innopolis.mputilov.sql.builder.*;
+import ru.innopolis.mputilov.sql.db.vo.TableAliasPair;
 import ru.innopolis.mputilov.sql.jdbc.XlsConnection;
 import ru.innopolis.mputilov.sql.jdbc.XlsManager;
-import ru.innopolis.mputilov.sql.jdbc.XlsResultSet;
+import ru.innopolis.mputilov.sql.db.ResultSet;
 
 import java.net.URL;
 
@@ -33,7 +34,7 @@ public class TableTest {
 
     @Test
     public void trivialJoin() {
-        XlsResultSet set = conn.createStatement().executeQuery(new SqlExp(
+        ResultSet set = conn.createStatement().executeQuery(new SqlExp(
                 new SelectExp(
                         new ColumnAliasPair("s1", "col1"),
                         new ColumnAliasPair("s1", "col2"),
@@ -59,7 +60,7 @@ public class TableTest {
 
     @Test
     public void trivialJoinAndWhere() {
-        XlsResultSet set = conn.createStatement().executeQuery(new SqlExp(
+        ResultSet set = conn.createStatement().executeQuery(new SqlExp(
                 new SelectExp(
                         new ColumnAliasPair("s1", "col1"),
                         new ColumnAliasPair("s1", "col2"),
@@ -86,7 +87,7 @@ public class TableTest {
 
     @Test
     public void trivialReordering() {
-        XlsResultSet set = conn.createStatement().executeQuery(new SqlExp(
+        ResultSet set = conn.createStatement().executeQuery(new SqlExp(
                 new SelectExp(
                         new ColumnAliasPair("s1", "col3"),
                         new ColumnAliasPair("s1", "col2"),

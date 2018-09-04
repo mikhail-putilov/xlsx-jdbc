@@ -4,9 +4,9 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.poi.ss.usermodel.*;
-import ru.innopolis.mputilov.sql.db_impl.DataBase;
-import ru.innopolis.mputilov.sql.db_impl.Table;
-import ru.innopolis.mputilov.sql.db_impl.Tuple;
+import ru.innopolis.mputilov.sql.db.Table;
+import ru.innopolis.mputilov.sql.db.Tuple;
+import ru.innopolis.mputilov.sql.jdbc.DataBase;
 
 import java.util.List;
 import java.util.Map;

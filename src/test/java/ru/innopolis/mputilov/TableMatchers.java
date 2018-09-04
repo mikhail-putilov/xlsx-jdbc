@@ -2,7 +2,7 @@ package ru.innopolis.mputilov;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
-import ru.innopolis.mputilov.sql.db_impl.Tuple;
+import ru.innopolis.mputilov.sql.db.Tuple;
 
 import java.util.Iterator;
 import java.util.Objects;

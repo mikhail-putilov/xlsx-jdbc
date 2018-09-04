@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Columns {
-    private List<ColumnExp> columnExps;
+    private final List<ColumnExp> columnExps;
 
     public Columns() {
         columnExps = new ArrayList<>();
     }
 
-    public Columns(List<ColumnExp> columnExps) {
+    private Columns(List<ColumnExp> columnExps) {
         this.columnExps = columnExps;
     }
 
@@ -143,7 +143,7 @@ public class Columns {
         return new Columns(new ArrayList<>(copy));
     }
 
-    public void add(ColumnExp c) {
+    private void add(ColumnExp c) {
         columnExps.add(c);
     }
 

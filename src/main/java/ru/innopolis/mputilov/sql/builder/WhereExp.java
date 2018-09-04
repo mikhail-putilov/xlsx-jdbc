@@ -3,8 +3,8 @@ package ru.innopolis.mputilov.sql.builder;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.innopolis.mputilov.sql.db_impl.Table;
-import ru.innopolis.mputilov.sql.db_impl.Tuple;
+import ru.innopolis.mputilov.sql.db.Table;
+import ru.innopolis.mputilov.sql.db.Tuple;
 
 import java.util.function.Function;
 
@@ -18,7 +18,7 @@ public class WhereExp implements Expression<Table> {
     private Function<Tuple, Tuple> rhsKeyExtractor;
 
     void setLhsKeyExtractor(Table lhs) {
-        int indexOfLhsColumn = lhs.getColumns().getIndexOf(lhsColumnExp);
+        int indexOfLhsColumn = lhs.getColumns().getIndexOf(lhsColumnExp.getTableAlias());
         lhsKeyExtractor = list -> Tuple.of(list.get(indexOfLhsColumn));
     }
 

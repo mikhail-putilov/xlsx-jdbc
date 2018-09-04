@@ -1,8 +1,8 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Getter;
-import ru.innopolis.mputilov.sql.db_impl.Table;
-import ru.innopolis.mputilov.sql.db_impl.Tuple;
+import ru.innopolis.mputilov.sql.db.Table;
+import ru.innopolis.mputilov.sql.db.Tuple;
 
 import java.util.List;
 import java.util.stream.Collectors;

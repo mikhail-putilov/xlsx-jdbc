@@ -4,9 +4,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import ru.innopolis.mputilov.sql.db_impl.DataBase;
-import ru.innopolis.mputilov.sql.jdbc.XlsConnectionFactory;
-import ru.innopolis.mputilov.sql.jdbc.XlsPopulatorFactory;
+import ru.innopolis.mputilov.sql.jdbc.DataBase;
+import ru.innopolis.mputilov.sql.jdbc.api.XlsConnectionFactory;
+import ru.innopolis.mputilov.sql.jdbc.api.XlsPopulatorFactory;
 
 public class DbModule extends AbstractModule {
     @Override

@@ -1,7 +1,8 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Getter;
-import ru.innopolis.mputilov.sql.db_impl.Table;
+import ru.innopolis.mputilov.sql.db.Table;
+import ru.innopolis.mputilov.sql.db.vo.TableAliasPair;
 
 import javax.annotation.Nullable;
 

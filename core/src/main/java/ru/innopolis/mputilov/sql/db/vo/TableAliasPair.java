@@ -1,4 +1,4 @@
-package ru.innopolis.mputilov.sql.builder;
+package ru.innopolis.mputilov.sql.db.vo;
 
 import lombok.Data;
 

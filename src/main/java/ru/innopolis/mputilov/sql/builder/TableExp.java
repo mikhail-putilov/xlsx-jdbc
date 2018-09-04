@@ -1,9 +1,9 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.innopolis.mputilov.sql.db_impl.Table;
+import ru.innopolis.mputilov.sql.db.Table;
+import ru.innopolis.mputilov.sql.db.vo.TableAliasPair;
 
 import java.util.function.Supplier;
 

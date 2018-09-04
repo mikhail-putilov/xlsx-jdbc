@@ -1,6 +1,6 @@
 package ru.innopolis.mputilov.sql.builder;
 
-import ru.innopolis.mputilov.sql.db_impl.Table;
+import ru.innopolis.mputilov.sql.db.Table;
 
 public interface Context {
     void addProjectionColumns(String tableAlias, Columns columns);

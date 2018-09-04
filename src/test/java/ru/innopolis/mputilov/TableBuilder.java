@@ -1,6 +1,6 @@
 package ru.innopolis.mputilov;
 
-import ru.innopolis.mputilov.sql.db_impl.Tuple;
+import ru.innopolis.mputilov.sql.db.Tuple;
 
 import java.util.ArrayList;
 import java.util.Iterator;

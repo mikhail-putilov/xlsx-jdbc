@@ -1,14 +1,11 @@
-package ru.innopolis.mputilov.sql.db_impl;
+package ru.innopolis.mputilov.sql.db;
 
 import com.google.common.base.Joiner;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.innopolis.mputilov.sql.builder.Columns;
-import ru.innopolis.mputilov.sql.builder.TableAliasPair;
-import ru.innopolis.mputilov.sql.builder.WhereExp;
-import ru.innopolis.mputilov.sql.jdbc.XlsResultSet;
+import ru.innopolis.mputilov.sql.db.vo.TableAliasPair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +26,7 @@ public class Table {
     private TreeMap<Tuple, Tuple> hashed = new TreeMap<>();
     private List<Tuple> rawTuples = new ArrayList<>();
 
-    Table(TableAliasPair tableAliasPair) {
+    public Table(TableAliasPair tableAliasPair) {
         this.tableName = tableAliasPair.getTableName();
         this.tableAlias = tableAliasPair.getAlias();
     }
@@ -85,11 +82,11 @@ public class Table {
         return joined;
     }
 
-    public XlsResultSet getResultSet() {
-        return new XlsResultSet(rawTuples);
+    public ResultSet getResultSet() {
+        return new ResultSet(rawTuples);
     }
 
-    public Table join(Table rhs, String joinedTableAlias, WhereExp predicate) {
+    public Table join(Table rhs, String joinedTableAlias, Function<Tuple, Tuple> lhsKeyExtractor, Function<Tuple, Tuple> rhsKeyExtractor) {
         if (isReccurent()) {
             throw new UnsupportedOperationException("cannot join reccurent table " + tableName);
         }
@@ -103,12 +100,12 @@ public class Table {
             throw new IllegalStateException("Rhs table is empty, nothing to join");
         }
         if (isRawTuplesAvailable()) {
-            rehash(predicate.getLhsKeyExtractor());
+            rehash(lhsKeyExtractor);
         } else {
             throw new IllegalStateException("Lhs table does not have raw tuples to rehash");
         }
         if (rhs.isRawTuplesAvailable()) {
-            rhs.rehash(predicate.getRhsKeyExtractor());
+            rhs.rehash(rhsKeyExtractor);
         } else {
             throw new IllegalStateException("Rhs table does not have raw tuple to rehash");
         }

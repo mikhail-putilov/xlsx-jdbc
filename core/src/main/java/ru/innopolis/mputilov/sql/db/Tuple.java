@@ -1,4 +1,4 @@
-package ru.innopolis.mputilov.sql.db_impl;
+package ru.innopolis.mputilov.sql.db;
 
 import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
@@ -22,7 +22,6 @@ public class Tuple implements Comparable<Tuple> {
         this.tuple = new ArrayList<>(left.getTuple().size() + right.getTuple().size());
         this.tuple.addAll(left.getTuple());
         this.tuple.addAll(right.getTuple());
-
     }
 
     public static Tuple of(List<Object> multipleObj) {

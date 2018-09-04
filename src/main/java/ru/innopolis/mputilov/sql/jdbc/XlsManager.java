@@ -3,7 +3,6 @@ package ru.innopolis.mputilov.sql.jdbc;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import ru.innopolis.mputilov.sql.DbModule;
-import ru.innopolis.mputilov.sql.db_impl.DataBase;
 
 import java.net.URL;
 
