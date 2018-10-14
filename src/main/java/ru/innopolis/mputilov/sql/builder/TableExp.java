@@ -24,7 +24,7 @@ public class TableExp implements Expression<Table> {
     }
 
     @Override
-    public Table eval(Context ctx) {
+    public Table eval(EvaluationContext ctx) {
         return table;
     }
 

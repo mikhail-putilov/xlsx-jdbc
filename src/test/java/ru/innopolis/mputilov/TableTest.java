@@ -5,10 +5,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.innopolis.mputilov.sql.builder.*;
+import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.db.ResultSet;
 import ru.innopolis.mputilov.sql.db.vo.TableAliasPair;
 import ru.innopolis.mputilov.sql.jdbc.XlsConnection;
 import ru.innopolis.mputilov.sql.jdbc.XlsManager;
-import ru.innopolis.mputilov.sql.db.ResultSet;
 
 import java.net.URL;
 
@@ -36,19 +37,19 @@ public class TableTest {
     public void trivialJoin() {
         ResultSet set = conn.createStatement().executeQuery(new SqlExp(
                 new SelectExp(
-                        new ColumnAliasPair("s1", "col1"),
-                        new ColumnAliasPair("s1", "col2"),
-                        new ColumnAliasPair("s1", "col3"),
-                        new ColumnAliasPair("s2", "col5"),
-                        new ColumnAliasPair("s2", "col6")),
+                        ColumnExp.of("s1", "col1"),
+                        ColumnExp.of("s1", "col2"),
+                        ColumnExp.of("s1", "col3"),
+                        ColumnExp.of("s2", "col5"),
+                        ColumnExp.of("s2", "col6")),
                 new JoinEq(
                         new TableExp(new TableAliasPair("s1", "Sheet1")),
                         new TableExp(new TableAliasPair("s2", "Sheet2")),
                         "j",
                         new WhereExp(
                                 EQ,
-                                new ColumnAliasPair("s1", "col1"),
-                                new ColumnAliasPair("s2", "col5"))),
+                                ColumnExp.of("s1", "col1"),
+                                ColumnExp.of("s2", "col5"))),
                 null,
                 null));
         assertThat(set, matchesTable(table()
@@ -62,23 +63,23 @@ public class TableTest {
     public void trivialJoinAndWhere() {
         ResultSet set = conn.createStatement().executeQuery(new SqlExp(
                 new SelectExp(
-                        new ColumnAliasPair("s1", "col1"),
-                        new ColumnAliasPair("s1", "col2"),
-                        new ColumnAliasPair("s1", "col3"),
-                        new ColumnAliasPair("s2", "col5"),
-                        new ColumnAliasPair("s2", "col6")),
+                        ColumnExp.of("s1", "col1"),
+                        ColumnExp.of("s1", "col2"),
+                        ColumnExp.of("s1", "col3"),
+                        ColumnExp.of("s2", "col5"),
+                        ColumnExp.of("s2", "col6")),
                 new JoinEq(
                         new TableExp(new TableAliasPair("s1", "Sheet1")),
                         new TableExp(new TableAliasPair("s2", "Sheet2")),
                         "j",
                         new WhereExp(
                                 EQ,
-                                new ColumnAliasPair("s1", "col1"),
-                                new ColumnAliasPair("s2", "col5"))),
+                                ColumnExp.of("s1", "col1"),
+                                ColumnExp.of("s2", "col5"))),
                 new WhereExp(
                         EQ,
-                        new ColumnAliasPair("s1", "col1"),
-                        new StaticColumnExp("4.0")),
+                        ColumnExp.of("s1", "col1"),
+                        ColumnExp.staticColumn("4.0")),
                 null));
         assertThat(set, matchesTable(table()
                 .row("4.0", "5.0", "6.0", "4.0", "blabla")
@@ -89,23 +90,23 @@ public class TableTest {
     public void trivialReordering() {
         ResultSet set = conn.createStatement().executeQuery(new SqlExp(
                 new SelectExp(
-                        new ColumnAliasPair("s1", "col3"),
-                        new ColumnAliasPair("s1", "col2"),
-                        new ColumnAliasPair("s2", "col5"),
-                        new ColumnAliasPair("s1", "col1"),
-                        new ColumnAliasPair("s2", "col6")),
+                        ColumnExp.of("s1", "col3"),
+                        ColumnExp.of("s1", "col2"),
+                        ColumnExp.of("s2", "col5"),
+                        ColumnExp.of("s1", "col1"),
+                        ColumnExp.of("s2", "col6")),
                 new JoinEq(
                         new TableExp(new TableAliasPair("s1", "Sheet1")),
                         new TableExp(new TableAliasPair("s2", "Sheet2")),
                         "j",
                         new WhereExp(
                                 EQ,
-                                new ColumnAliasPair("s1", "col1"),
-                                new ColumnAliasPair("s2", "col5"))),
+                                ColumnExp.of("s1", "col1"),
+                                ColumnExp.of("s2", "col5"))),
                 new WhereExp(
                         EQ,
-                        new ColumnAliasPair("s1", "col1"),
-                        new StaticColumnExp("4.0")),
+                        ColumnExp.of("s1", "col1"),
+                        ColumnExp.staticColumn("4.0")),
                 null));
         assertThat(set, matchesTable(table()
                 .row("6.0", "5.0", "4.0", "4.0", "blabla")

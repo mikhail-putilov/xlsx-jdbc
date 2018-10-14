@@ -1,6 +1,8 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Getter;
+import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.db.Columns;
 import ru.innopolis.mputilov.sql.db.Table;
 import ru.innopolis.mputilov.sql.db.Tuple;
 
@@ -10,44 +12,47 @@ import java.util.stream.Collectors;
 @Getter
 public class SelectExp implements Expression<Table> {
 
-    private Columns columns;
+    private ColumnsExp columns;
     /**
      * Given unordered tuple:
+     * <pre>
      *      0 1 2
      *      | | |
      *      v v v
      * A = [b a c]
+     * </pre>
      * and desirable order:
+     * <pre>
      *      0 1 2
      *      | | |
      *      v v v
      * D = [a b c]
-     *
+     * </pre>
      * permutation field maps D'th indexes to indexes in A
      * So, permutation would be in that example:
+     * <pre>
      *      0 1 2
      *      | | |
      *      v v v
      * P = [1 0 2]
-     *
+     * </pre>
      */
     private List<Integer> permutation;
 
     public SelectExp(ColumnExp... columnExp) {
-        this.columns = new Columns(columnExp);
+        this.columns = new ColumnsExp(columnExp);
     }
 
     @Override
-    public Table eval(Context ctx) {
-        if (ctx.getCurrentContextState() == ContextState.PROCESSING_TABLE) {
-            Table table = ctx.getCurrentProcessingTable();
-            Columns actual = table.getColumns();
-            permutation = columns.stream().map(actual::getIndexOf).collect(Collectors.toList());
-            reorderTuples(table.getRawTuples());
-            return table;
-        } else {
-            throw new UnsupportedOperationException("Static processing is not supported yet");
-        }
+    public Table eval(EvaluationContext ctx) {
+        Table table = ctx.getCurrentProcessingTable();
+        Columns actual = table.getColumns();
+        permutation = columns.stream()
+                .map(ColumnExp::toColumnAliasPair)
+                .map(actual::getIndexOf)
+                .collect(Collectors.toList());
+        reorderTuples(table.getRawTuples());
+        return table;
     }
 
     private void reorderTuples(List<Tuple> tuples) {

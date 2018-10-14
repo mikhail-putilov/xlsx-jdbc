@@ -31,7 +31,7 @@ public class DataBase implements TableFactory {
     }
 
     @SneakyThrows(IOException.class)
-    public XlsConnection createXlsConnection(URL filename) {
+    XlsConnection createXlsConnection(URL filename) {
         Workbook workbook = new XSSFWorkbook(filename.openStream());
         XlsConnection xlsConnection = xlsConnectionFactory.create(filename, workbook);
         openedConnections.add(xlsConnection);

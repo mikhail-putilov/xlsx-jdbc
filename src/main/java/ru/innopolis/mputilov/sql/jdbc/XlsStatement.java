@@ -23,7 +23,7 @@ public class XlsStatement {
     }
 
     public ResultSet executeQuery(Expression<Table> expression) {
-        Context evaluationContext = new EvaluationContext();
+        EvaluationContext evaluationContext = new EvaluationContext();
         Visitor hoister = new Hoister(evaluationContext);
         expression.accept(hoister);
 

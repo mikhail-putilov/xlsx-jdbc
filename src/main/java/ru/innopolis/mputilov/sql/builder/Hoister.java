@@ -1,12 +1,14 @@
 package ru.innopolis.mputilov.sql.builder;
 
+import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+
 /**
  * Hoist definition of columns from whole sql expression and fill context with that data
  */
 public class Hoister implements Visitor {
-    private Context evaluationContext;
+    private EvaluationContext evaluationContext;
 
-    public Hoister(Context evaluationContext) {
+    public Hoister(EvaluationContext evaluationContext) {
         this.evaluationContext = evaluationContext;
     }
 
@@ -17,9 +19,10 @@ public class Hoister implements Visitor {
 
     @Override
     public void visitSelectExpression(SelectExp expression) {
-        Columns columns = expression.getColumns();
+        ColumnsExp columns = expression.getColumns();
         columns.getAllAliases()
-                .forEach(tableAlias -> evaluationContext.addProjectionColumns(tableAlias, columns.getColumnsForTableWithAlias(tableAlias)));
+                .forEach(tableAlias ->
+                        evaluationContext.addProjectionColumns(tableAlias, columns.getColumnsForTableWithAlias(tableAlias)));
     }
 
     @Override

@@ -23,9 +23,8 @@ public class SqlExp extends TableExp {
     }
 
     @Override
-    public Table eval(Context ctx) {
+    public Table eval(EvaluationContext ctx) {
         if (fromExp != null) {
-            ctx.setCurrentContextState(ContextState.PROCESSING_TABLE);
             Table eval = fromExp.eval(ctx);
             ctx.setCurrentProcessingTable(eval);
             if (whereExp != null) {

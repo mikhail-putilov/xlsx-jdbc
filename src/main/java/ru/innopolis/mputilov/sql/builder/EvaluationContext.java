@@ -3,23 +3,22 @@ package ru.innopolis.mputilov.sql.builder;
 import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
+import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
 import ru.innopolis.mputilov.sql.db.Table;
 
 import java.util.Map;
 
 @Getter
 @Setter
-public class EvaluationContext implements Context {
-    private ContextState currentContextState;
+public class EvaluationContext {
     private Table currentProcessingTable;
     /**
      * table alias -> projected columns
      */
-    private Map<String, Columns> tableAlias2ProjectionColumns = Maps.newLinkedHashMap();
+    private Map<String, ColumnsExp> tableAlias2ProjectionColumns = Maps.newLinkedHashMap();
 
-    @Override
-    public void addProjectionColumns(String tableAlias, Columns columns) {
-        Columns exists = tableAlias2ProjectionColumns.get(tableAlias);
+    void addProjectionColumns(String tableAlias, ColumnsExp columns) {
+        ColumnsExp exists = tableAlias2ProjectionColumns.get(tableAlias);
         if (exists != null) {
             exists.combineDistinct(columns);
         } else {
@@ -27,14 +26,12 @@ public class EvaluationContext implements Context {
         }
     }
 
-    @Override
-    public void addProjectionColumn(ColumnExp column) {
-        tableAlias2ProjectionColumns.putIfAbsent(column.getTableAlias(), new Columns());
+    void addProjectionColumn(ColumnExp column) {
+        tableAlias2ProjectionColumns.putIfAbsent(column.getTableAlias(), new ColumnsExp());
         tableAlias2ProjectionColumns.get(column.getTableAlias()).addDistinct(column);
     }
 
-    @Override
-    public Columns getProjectedColumnsFor(String tableAlias) {
+    ColumnsExp getProjectedColumnsFor(String tableAlias) {
         return tableAlias2ProjectionColumns.get(tableAlias);
     }
 }

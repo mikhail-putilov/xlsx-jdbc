@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.poi.ss.usermodel.*;
+import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
 import ru.innopolis.mputilov.sql.db.Table;
 import ru.innopolis.mputilov.sql.db.Tuple;
 import ru.innopolis.mputilov.sql.jdbc.DataBase;
@@ -11,15 +12,14 @@ import ru.innopolis.mputilov.sql.jdbc.DataBase;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class XlsPopulator implements Visitor {
-    private Context evaluationContext;
+    private EvaluationContext evaluationContext;
     private DataBase db;
     private Workbook workbook;
 
     @Inject
-    XlsPopulator(@Assisted Context evaluationContext, @Assisted Workbook workbook, DataBase db) {
+    XlsPopulator(@Assisted EvaluationContext evaluationContext, @Assisted Workbook workbook, DataBase db) {
         this.evaluationContext = evaluationContext;
         this.db = db;
         this.workbook = workbook;
@@ -55,13 +55,16 @@ public class XlsPopulator implements Visitor {
 
     private void fromWorkbook(Table table) {
         Sheet sheet = workbook.getSheet(table.getTableName());
-        Columns projectedColumns = evaluationContext.getProjectedColumnsFor(table.getTableAlias());
-        table.setColumns(projectedColumns);
+        ColumnsExp projectedColumns = evaluationContext.getProjectedColumnsFor(table.getTableAlias());
+        table.setColumns(projectedColumns.toColumns());
 
-        Map<ColumnExp, Integer> nameToIndexInXls = StreamSupport.stream(sheet.getRow(0).spliterator(), false)
-                .filter(cell -> projectedColumns.containsTableName(cell.getStringCellValue()))
-                .collect(Collectors.toMap(c -> new ColumnAliasPair(table.getTableAlias(), c.getStringCellValue()), Cell::getColumnIndex));
-        if (projectedColumns.size() != nameToIndexInXls.size()) {
+        Map<ColumnExp, Integer> columnNameToColumnIndexInXls = PoiStream.stream(sheet)
+                .filter(cell -> {
+                    String tableName = cell.getStringCellValue();
+                    return projectedColumns.containsColumnName(tableName);
+                })
+                .collect(Collectors.toMap(c1 -> ColumnExp.of(table.getTableAlias(), c1.getStringCellValue()), Cell::getColumnIndex));
+        if (projectedColumns.size() != columnNameToColumnIndexInXls.size()) {
             throw new IllegalStateException("Not all columns found in xls");
         }
 
@@ -69,7 +72,7 @@ public class XlsPopulator implements Visitor {
             row.forEach(c -> c.setCellType(CellType.STRING));
             // preserve order of columns
             List<Object> tuple = projectedColumns.stream()
-                    .map(columnName -> row.getCell(nameToIndexInXls.get(columnName)).getStringCellValue())
+                    .map(columnName -> row.getCell(columnNameToColumnIndexInXls.get(columnName)).getStringCellValue())
                     .collect(Collectors.toList());
             table.addRawTuple(new Tuple(tuple));
         }
