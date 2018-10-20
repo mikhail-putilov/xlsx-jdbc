@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.innopolis.mputilov.sql.db.vo.TableAliasPair;
 
 import java.util.ArrayList;
 import java.util.List;

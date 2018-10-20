@@ -7,7 +7,7 @@ import org.junit.Test;
 import ru.innopolis.mputilov.sql.builder.*;
 import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
 import ru.innopolis.mputilov.sql.db.ResultSet;
-import ru.innopolis.mputilov.sql.db.vo.TableAliasPair;
+import ru.innopolis.mputilov.sql.db.TableAliasPair;
 import ru.innopolis.mputilov.sql.jdbc.XlsConnection;
 import ru.innopolis.mputilov.sql.jdbc.XlsManager;
 

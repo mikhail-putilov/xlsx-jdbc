@@ -6,7 +6,7 @@ import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ru.innopolis.mputilov.sql.db.Table;
-import ru.innopolis.mputilov.sql.db.vo.TableAliasPair;
+import ru.innopolis.mputilov.sql.db.TableAliasPair;
 import ru.innopolis.mputilov.sql.event.ConnectionClosedEvent;
 import ru.innopolis.mputilov.sql.jdbc.api.TableFactory;
 import ru.innopolis.mputilov.sql.jdbc.api.XlsConnectionFactory;

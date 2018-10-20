@@ -1,7 +1,5 @@
 package ru.innopolis.mputilov.sql.db;
 
-import ru.innopolis.mputilov.sql.db.vo.ColumnAliasPair;
-
 import java.util.*;
 
 public class Columns {

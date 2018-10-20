@@ -3,7 +3,7 @@ package ru.innopolis.mputilov.sql.builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.innopolis.mputilov.sql.db.Table;
-import ru.innopolis.mputilov.sql.db.vo.TableAliasPair;
+import ru.innopolis.mputilov.sql.db.TableAliasPair;
 
 import java.util.function.Supplier;
 

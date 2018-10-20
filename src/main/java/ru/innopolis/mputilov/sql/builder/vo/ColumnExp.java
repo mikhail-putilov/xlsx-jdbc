@@ -2,7 +2,7 @@ package ru.innopolis.mputilov.sql.builder.vo;
 
 import lombok.Data;
 import lombok.Getter;
-import ru.innopolis.mputilov.sql.db.vo.ColumnAliasPair;
+import ru.innopolis.mputilov.sql.db.ColumnAliasPair;
 
 @Data(staticConstructor = "of")
 public final class ColumnExp {
