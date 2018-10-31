@@ -1,13 +1,15 @@
-package ru.innopolis.mputilov.sql.db_impl;
+package ru.innopolis.mputilov.sql.jdbc;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import lombok.SneakyThrows;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import ru.innopolis.mputilov.sql.builder.TableAliasPair;
+import ru.innopolis.mputilov.sql.db.Table;
+import ru.innopolis.mputilov.sql.db.TableAliasPair;
 import ru.innopolis.mputilov.sql.event.ConnectionClosedEvent;
-import ru.innopolis.mputilov.sql.jdbc.XlsConnection;
-import ru.innopolis.mputilov.sql.jdbc.XlsConnectionFactory;
+import ru.innopolis.mputilov.sql.jdbc.api.TableFactory;
+import ru.innopolis.mputilov.sql.jdbc.api.XlsConnectionFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -29,8 +31,8 @@ public class DataBase implements TableFactory {
     }
 
     @SneakyThrows(IOException.class)
-    public XlsConnection createXlsConnection(URL filename) {
-        XSSFWorkbook workbook = new XSSFWorkbook(filename.openStream());
+    XlsConnection createXlsConnection(URL filename) {
+        Workbook workbook = new XSSFWorkbook(filename.openStream());
         XlsConnection xlsConnection = xlsConnectionFactory.create(filename, workbook);
         openedConnections.add(xlsConnection);
         return xlsConnection;

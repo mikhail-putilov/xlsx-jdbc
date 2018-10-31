@@ -3,38 +3,35 @@ package ru.innopolis.mputilov.sql.builder;
 import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
-import ru.innopolis.mputilov.sql.db_impl.Table;
+import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.db.Table;
 
 import java.util.Map;
 
 @Getter
 @Setter
-public class EvaluationContext implements Context {
-    private ContextState currentContextState;
+public class EvaluationContext {
     private Table currentProcessingTable;
     /**
-     * id of expression -> projected columns
+     * table alias -> projected columns
      */
-    private Map<String, Columns> projectionInfo = Maps.newLinkedHashMap();
+    private Map<String, ColumnsExp> tableAlias2ProjectionColumns = Maps.newLinkedHashMap();
 
-    @Override
-    public void addProjectionColumns(String tableAlias, Columns columns) {
-        Columns exists = projectionInfo.get(tableAlias);
+    void addProjectionColumns(String tableAlias, ColumnsExp columns) {
+        ColumnsExp exists = tableAlias2ProjectionColumns.get(tableAlias);
         if (exists != null) {
             exists.combineDistinct(columns);
         } else {
-            projectionInfo.put(tableAlias, columns);
+            tableAlias2ProjectionColumns.put(tableAlias, columns);
         }
     }
 
-    @Override
-    public void addProjectionColumn(ColumnExp columnExp) {
-        projectionInfo.putIfAbsent(columnExp.getTableAlias(), new Columns());
-        projectionInfo.get(columnExp.getTableAlias()).addDistinct(columnExp);
+    void addProjectionColumn(ColumnExp column) {
+        tableAlias2ProjectionColumns.putIfAbsent(column.getTableAlias(), new ColumnsExp());
+        tableAlias2ProjectionColumns.get(column.getTableAlias()).addDistinct(column);
     }
 
-    @Override
-    public Columns getProjectedColumnsFor(String tableAlias) {
-        return projectionInfo.get(tableAlias);
+    ColumnsExp getProjectedColumnsFor(String tableAlias) {
+        return tableAlias2ProjectionColumns.get(tableAlias);
     }
 }

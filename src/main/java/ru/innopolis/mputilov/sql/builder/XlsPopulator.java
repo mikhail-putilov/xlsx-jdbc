@@ -4,22 +4,26 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.poi.ss.usermodel.*;
-import ru.innopolis.mputilov.sql.db_impl.DataBase;
-import ru.innopolis.mputilov.sql.db_impl.Table;
-import ru.innopolis.mputilov.sql.db_impl.Tuple;
+import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.db.Table;
+import ru.innopolis.mputilov.sql.db.TableHeader;
+import ru.innopolis.mputilov.sql.db.Tuple;
+import ru.innopolis.mputilov.sql.jdbc.DataBase;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class XlsPopulator implements Visitor {
-    private Context evaluationContext;
+    private EvaluationContext evaluationContext;
     private DataBase db;
     private Workbook workbook;
 
     @Inject
-    XlsPopulator(@Assisted Context evaluationContext, @Assisted Workbook workbook, DataBase db) {
+    XlsPopulator(@Assisted EvaluationContext evaluationContext, @Assisted Workbook workbook, DataBase db) {
         this.evaluationContext = evaluationContext;
         this.db = db;
         this.workbook = workbook;
@@ -37,7 +41,7 @@ public class XlsPopulator implements Visitor {
 
     @Override
     public void visitTableExpression(TableExp expression) {
-        expression.initTable(() -> db.getOrCreateTable(expression.getTableAliasPair()));
+        expression.setTable(db.getOrCreateTable(expression.getTableAliasPair()));
         Table table = expression.getTable();
         table.populateTable(this::fromWorkbook);
     }
@@ -54,24 +58,47 @@ public class XlsPopulator implements Visitor {
 
 
     private void fromWorkbook(Table table) {
-        Sheet sheet = workbook.getSheet(table.getTableName());
-        Columns projectedColumns = evaluationContext.getProjectedColumnsFor(table.getTableAlias());
-        table.setColumns(projectedColumns);
+        TableHeader header = table.getHeader();
+        Sheet sheet = workbook.getSheet(header.getTableName());
+        ColumnsExp projectedColumns = evaluationContext.getProjectedColumnsFor(header.getTableAlias());
+        header.setColumns(projectedColumns.toColumns());
 
-        Map<ColumnExp, Integer> nameToIndexInXls = StreamSupport.stream(sheet.getRow(0).spliterator(), false)
-                .filter(cell -> projectedColumns.containsTableName(cell.getStringCellValue()))
-                .collect(Collectors.toMap(c -> new ColumnAliasPair(table.getTableAlias(), c.getStringCellValue()), Cell::getColumnIndex));
-        if (projectedColumns.size() != nameToIndexInXls.size()) {
+        Map<ColumnExp, Integer> columnNameToColumnIndexInXls = PoiStream.stream(sheet)
+                .filter(isColumnOfProjection(projectedColumns))
+                .collect(toMap(header));
+        if (projectedColumns.size() != columnNameToColumnIndexInXls.size()) {
             throw new IllegalStateException("Not all columns found in xls");
         }
 
         for (Row row : Iterables.skip(sheet, 1)) {
+            // quick aspirin for Apache POI implementation:
             row.forEach(c -> c.setCellType(CellType.STRING));
             // preserve order of columns
-            List<Object> tuple = projectedColumns.stream()
-                    .map(columnName -> row.getCell(nameToIndexInXls.get(columnName)).getStringCellValue())
-                    .collect(Collectors.toList());
+            List<Object> tuple = extractColumnsPreserveOrder(projectedColumns, columnNameToColumnIndexInXls, row);
             table.addRawTuple(new Tuple(tuple));
         }
     }
+
+    private List<Object> extractColumnsPreserveOrder(ColumnsExp order,
+                                                     Map<ColumnExp, Integer> columnNameToColumnIndexInXls,
+                                                     Row row) {
+        return order.stream()
+                .map(columnName -> row.getCell(columnNameToColumnIndexInXls.get(columnName)))
+                .map(Cell::getStringCellValue)
+                .collect(Collectors.toList());
+    }
+
+    private Collector<Cell, ?, Map<ColumnExp, Integer>> toMap(TableHeader header) {
+        Function<Cell, ColumnExp> keyMapper = cell -> ColumnExp.of(header.getTableAlias(), cell.getStringCellValue());
+        Function<Cell, Integer> valueMapper = Cell::getColumnIndex;
+        return Collectors.toMap(keyMapper, valueMapper);
+    }
+
+    private Predicate<Cell> isColumnOfProjection(ColumnsExp projectedColumns) {
+        return cell -> {
+            String tableName = cell.getStringCellValue();
+            return projectedColumns.containsColumnName(tableName);
+        };
+    }
+
 }

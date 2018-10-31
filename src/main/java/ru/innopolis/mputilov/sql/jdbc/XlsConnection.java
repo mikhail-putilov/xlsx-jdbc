@@ -4,20 +4,22 @@ package ru.innopolis.mputilov.sql.jdbc;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ru.innopolis.mputilov.sql.event.ConnectionClosedEvent;
+import ru.innopolis.mputilov.sql.jdbc.api.XlsStatementFactory;
+import ru.innopolis.mputilov.sql.jdbc.api.XlsPopulatorFactory;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Objects;
 
 /**
- * Opens connection to xlsx database
- * Keeps it open and closes when its appropriate
+ * Represents a connection to a xls database
+ * Warning: autocloseable
  */
-public class XlsConnection implements AutoCloseable {
+@EqualsAndHashCode(of = {"filename"})
+public class XlsConnection implements AutoCloseable, XlsStatementFactory {
     private final URL filename;
     private final Workbook workbook;
     private final EventBus eventBus;
@@ -35,25 +37,13 @@ public class XlsConnection implements AutoCloseable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        XlsConnection that = (XlsConnection) o;
-        return Objects.equals(filename.getPath(), that.filename.getPath());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(filename.getPath());
-    }
-
-    @Override
     @SneakyThrows(IOException.class)
     public void close() {
         eventBus.post(new ConnectionClosedEvent(this));
         workbook.close();
     }
 
+    @Override
     public XlsStatement createStatement() {
         return new XlsStatement(workbook, xlsPopulatorFactory);
     }

@@ -3,8 +3,9 @@ package ru.innopolis.mputilov.sql.builder;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.innopolis.mputilov.sql.db_impl.Table;
-import ru.innopolis.mputilov.sql.db_impl.Tuple;
+import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.db.Table;
+import ru.innopolis.mputilov.sql.db.Tuple;
 
 import java.util.function.Function;
 
@@ -17,24 +18,21 @@ public class WhereExp implements Expression<Table> {
     private Function<Tuple, Tuple> lhsKeyExtractor;
     private Function<Tuple, Tuple> rhsKeyExtractor;
 
-    void setLhsKeyExtractor(Table lhs) {
-        int indexOfLhsColumn = lhs.getColumns().getIndexOf(lhsColumnExp);
+    void createLhsKeyExtractor(Table lhs) {
+        int indexOfLhsColumn = lhs.getHeader().getColumns().getIndexOf(lhsColumnExp.toColumnAliasPair());
         lhsKeyExtractor = list -> Tuple.of(list.get(indexOfLhsColumn));
     }
 
-    void setRhsKeyExtractor(Table rhs) {
-        int indexOfRhsColumn = rhs.getColumns().getIndexOf(rhsColumnExp);
+    void createRhsKeyExtractor(Table rhs) {
+        int indexOfRhsColumn = rhs.getHeader().getColumns().getIndexOf(rhsColumnExp.toColumnAliasPair());
         rhsKeyExtractor = list -> Tuple.of(list.get(indexOfRhsColumn));
     }
 
     @Override
-    public Table eval(Context ctx) {
-        if (ctx.getCurrentContextState() != ContextState.PROCESSING_TABLE) {
-            throw new IllegalStateException();
-        }
+    public Table eval(EvaluationContext ctx) {
         Table currentProcessingTable = ctx.getCurrentProcessingTable();
         if (lhsColumnExp.isStatic() && rhsColumnExp.isStatic()) {
-            Boolean match = operation.apply(lhsColumnExp.getStatic(), rhsColumnExp.getStatic());
+            Boolean match = operation.apply(lhsColumnExp.getStaticValue(), rhsColumnExp.getStaticValue());
             if (match) {
                 return currentProcessingTable;
             } else {
@@ -45,19 +43,19 @@ public class WhereExp implements Expression<Table> {
         if (!lhsColumnExp.isStatic() && !rhsColumnExp.isStatic()) {
             Preconditions.checkState(lhsKeyExtractor == null, "current predicate already has lhsKeyExtractor");
             Preconditions.checkState(rhsKeyExtractor == null, "current predicate already has rhsKeyExtractor");
-            setLhsKeyExtractor(currentProcessingTable);
-            setRhsKeyExtractor(currentProcessingTable);
+            createLhsKeyExtractor(currentProcessingTable);
+            createRhsKeyExtractor(currentProcessingTable);
             currentProcessingTable.removeIf(t -> !operation.apply(lhsKeyExtractor.apply(t), rhsKeyExtractor.apply(t)));
         }
         if (!rhsColumnExp.isStatic() && lhsColumnExp.isStatic()) {
             Preconditions.checkState(rhsKeyExtractor == null, "current predicate already has rhsKeyExtractor");
-            setRhsKeyExtractor(currentProcessingTable);
-            final Object lhsStatic = lhsColumnExp.getStatic();
+            createRhsKeyExtractor(currentProcessingTable);
+            final Object lhsStatic = lhsColumnExp.getStaticValue();
             currentProcessingTable.removeIf(t -> !operation.apply(lhsStatic, rhsKeyExtractor.apply(t)));
         } else if (rhsColumnExp.isStatic() && !lhsColumnExp.isStatic()) {
             Preconditions.checkState(lhsKeyExtractor == null, "current predicate already has lhsKeyExtractor");
-            setLhsKeyExtractor(currentProcessingTable);
-            final Tuple rhsStatic = Tuple.of(rhsColumnExp.getStatic());
+            createLhsKeyExtractor(currentProcessingTable);
+            final Tuple rhsStatic = Tuple.of(rhsColumnExp.getStaticValue());
             currentProcessingTable.removeIf(t -> {
                 Tuple key = lhsKeyExtractor.apply(t);
                 return !operation.apply(key, rhsStatic);

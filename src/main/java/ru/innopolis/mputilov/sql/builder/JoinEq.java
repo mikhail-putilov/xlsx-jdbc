@@ -1,7 +1,8 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Getter;
-import ru.innopolis.mputilov.sql.db_impl.Table;
+import ru.innopolis.mputilov.sql.db.Table;
+import ru.innopolis.mputilov.sql.db.TableAliasPair;
 
 import java.util.UUID;
 
@@ -24,14 +25,14 @@ public class JoinEq extends TableExp {
     }
 
     @Override
-    public Table eval(Context ctx) {
+    public Table eval(EvaluationContext ctx) {
         Table lhs = this.lhs.eval(ctx);
         Table rhs = this.rhs.eval(ctx);
 
-        predicate.setRhsKeyExtractor(rhs);
-        predicate.setLhsKeyExtractor(lhs);
+        predicate.createRhsKeyExtractor(rhs);
+        predicate.createLhsKeyExtractor(lhs);
 
-        table = lhs.join(rhs, joinedTableAlias, predicate);
+        table = lhs.join(rhs, joinedTableAlias, predicate.getLhsKeyExtractor(), predicate.getRhsKeyExtractor());
         return table;
     }
 

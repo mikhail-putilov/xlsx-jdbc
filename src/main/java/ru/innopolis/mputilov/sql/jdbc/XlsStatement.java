@@ -2,11 +2,10 @@ package ru.innopolis.mputilov.sql.jdbc;
 
 import com.google.inject.assistedinject.Assisted;
 import org.apache.poi.ss.usermodel.Workbook;
-import ru.innopolis.mputilov.sql.builder.Context;
-import ru.innopolis.mputilov.sql.builder.EvaluationContext;
-import ru.innopolis.mputilov.sql.builder.Expression;
-import ru.innopolis.mputilov.sql.builder.Visitor;
-import ru.innopolis.mputilov.sql.db_impl.Table;
+import ru.innopolis.mputilov.sql.builder.*;
+import ru.innopolis.mputilov.sql.db.ResultSet;
+import ru.innopolis.mputilov.sql.jdbc.api.XlsPopulatorFactory;
+import ru.innopolis.mputilov.sql.db.Table;
 
 import javax.inject.Inject;
 
@@ -23,8 +22,8 @@ public class XlsStatement {
         this.xlsPopulatorFactory = xlsPopulatorFactory;
     }
 
-    public XlsResultSet executeQuery(Expression<Table> expression) {
-        Context evaluationContext = new EvaluationContext();
+    public ResultSet executeQuery(Expression<Table> expression) {
+        EvaluationContext evaluationContext = new EvaluationContext();
         Visitor hoister = new Hoister(evaluationContext);
         expression.accept(hoister);
 

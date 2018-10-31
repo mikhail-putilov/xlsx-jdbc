@@ -1,11 +1,9 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.innopolis.mputilov.sql.db_impl.Table;
-
-import java.util.function.Supplier;
+import ru.innopolis.mputilov.sql.db.Table;
+import ru.innopolis.mputilov.sql.db.TableAliasPair;
 
 @Setter
 @Getter
@@ -17,14 +15,8 @@ public class TableExp implements Expression<Table> {
         this.tableAliasPair = tableAliasPair;
     }
 
-    void initTable(Supplier<Table> supplier) {
-        if (table == null) {
-            table = supplier.get();
-        }
-    }
-
     @Override
-    public Table eval(Context ctx) {
+    public Table eval(EvaluationContext ctx) {
         return table;
     }
 
