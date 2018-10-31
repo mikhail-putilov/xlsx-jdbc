@@ -1,4 +1,4 @@
-package ru.innopolis.mputilov.sql.builder.vo;
+package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Data;
 import lombok.Getter;
@@ -17,11 +17,11 @@ public final class ColumnExp {
         return column;
     }
 
-    public ColumnAliasPair toColumnAliasPair() {
+    ColumnAliasPair toColumnAliasPair() {
         return new ColumnAliasPair(tableAlias, columnName);
     }
 
-    public boolean isStatic() {
+    boolean isStatic() {
         return staticValue != null;
     }
 }

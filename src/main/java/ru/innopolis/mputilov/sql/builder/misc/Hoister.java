@@ -1,6 +1,6 @@
-package ru.innopolis.mputilov.sql.builder;
+package ru.innopolis.mputilov.sql.builder.misc;
 
-import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.builder.*;
 
 /**
  * Hoist definition of columns from whole sql expression and fill context with that data
@@ -13,7 +13,7 @@ public class Hoister implements Visitor {
     }
 
     @Override
-    public void visitJoinEqExpression(JoinEq expression) {
+    public void visitJoinEqExpression(JoinEqExp expression) {
         //no-op
     }
 

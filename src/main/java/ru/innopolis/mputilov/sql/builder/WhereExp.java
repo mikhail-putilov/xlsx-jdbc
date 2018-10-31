@@ -3,7 +3,9 @@ package ru.innopolis.mputilov.sql.builder;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.builder.misc.EvaluationContext;
+import ru.innopolis.mputilov.sql.builder.misc.Operation;
+import ru.innopolis.mputilov.sql.builder.misc.Visitor;
 import ru.innopolis.mputilov.sql.db.Table;
 import ru.innopolis.mputilov.sql.db.Tuple;
 
@@ -11,7 +13,7 @@ import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public class WhereExp implements Expression<Table> {
+public class WhereExp implements Exp<Table> {
     private final Operation operation;
     private final ColumnExp lhsColumnExp;
     private final ColumnExp rhsColumnExp;

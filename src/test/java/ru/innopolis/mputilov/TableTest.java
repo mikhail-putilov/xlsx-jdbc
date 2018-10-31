@@ -5,7 +5,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.innopolis.mputilov.sql.builder.*;
-import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.builder.ColumnExp;
 import ru.innopolis.mputilov.sql.db.ResultSet;
 import ru.innopolis.mputilov.sql.db.TableAliasPair;
 import ru.innopolis.mputilov.sql.jdbc.XlsConnection;
@@ -16,7 +16,7 @@ import java.net.URL;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static ru.innopolis.mputilov.TableBuilder.table;
 import static ru.innopolis.mputilov.TableMatchers.matchesTable;
-import static ru.innopolis.mputilov.sql.builder.Operation.EQ;
+import static ru.innopolis.mputilov.sql.builder.misc.Operation.EQ;
 
 public class TableTest {
 
@@ -42,7 +42,7 @@ public class TableTest {
                         ColumnExp.of("s1", "col3"),
                         ColumnExp.of("s2", "col5"),
                         ColumnExp.of("s2", "col6")),
-                new JoinEq(
+                new JoinEqExp(
                         new TableExp(new TableAliasPair("s1", "Sheet1")),
                         new TableExp(new TableAliasPair("s2", "Sheet2")),
                         "j",
@@ -68,7 +68,7 @@ public class TableTest {
                         ColumnExp.of("s1", "col3"),
                         ColumnExp.of("s2", "col5"),
                         ColumnExp.of("s2", "col6")),
-                new JoinEq(
+                new JoinEqExp(
                         new TableExp(new TableAliasPair("s1", "Sheet1")),
                         new TableExp(new TableAliasPair("s2", "Sheet2")),
                         "j",
@@ -95,7 +95,7 @@ public class TableTest {
                         ColumnExp.of("s2", "col5"),
                         ColumnExp.of("s1", "col1"),
                         ColumnExp.of("s2", "col6")),
-                new JoinEq(
+                new JoinEqExp(
                         new TableExp(new TableAliasPair("s1", "Sheet1")),
                         new TableExp(new TableAliasPair("s2", "Sheet2")),
                         "j",

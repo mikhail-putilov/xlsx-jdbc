@@ -1,10 +1,10 @@
-package ru.innopolis.mputilov.sql.builder;
+package ru.innopolis.mputilov.sql.builder.misc;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.poi.ss.usermodel.*;
-import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.builder.*;
 import ru.innopolis.mputilov.sql.db.Table;
 import ru.innopolis.mputilov.sql.db.TableHeader;
 import ru.innopolis.mputilov.sql.db.Tuple;
@@ -30,7 +30,7 @@ public class XlsPopulator implements Visitor {
     }
 
     @Override
-    public void visitJoinEqExpression(JoinEq expression) {
+    public void visitJoinEqExpression(JoinEqExp expression) {
 
     }
 

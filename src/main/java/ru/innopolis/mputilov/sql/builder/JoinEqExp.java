@@ -1,22 +1,24 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Getter;
+import ru.innopolis.mputilov.sql.builder.misc.EvaluationContext;
+import ru.innopolis.mputilov.sql.builder.misc.Visitor;
 import ru.innopolis.mputilov.sql.db.Table;
 import ru.innopolis.mputilov.sql.db.TableAliasPair;
 
 import java.util.UUID;
 
 @Getter
-public class JoinEq extends TableExp {
-    private Expression<Table> lhs;
-    private Expression<Table> rhs;
+public class JoinEqExp extends TableExp {
+    private Exp<Table> lhs;
+    private Exp<Table> rhs;
     private String joinedTableAlias;
     private WhereExp predicate;
 
-    public JoinEq(Expression<Table> lhs,
-                  Expression<Table> rhs,
-                  String joinedTableAlias,
-                  WhereExp predicate) {
+    public JoinEqExp(Exp<Table> lhs,
+                     Exp<Table> rhs,
+                     String joinedTableAlias,
+                     WhereExp predicate) {
         super(new TableAliasPair(joinedTableAlias, "Joined-" + UUID.randomUUID().toString()));
         this.lhs = lhs;
         this.rhs = rhs;

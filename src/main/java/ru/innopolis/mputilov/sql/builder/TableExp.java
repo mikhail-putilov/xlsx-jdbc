@@ -2,12 +2,14 @@ package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.innopolis.mputilov.sql.builder.misc.EvaluationContext;
+import ru.innopolis.mputilov.sql.builder.misc.Visitor;
 import ru.innopolis.mputilov.sql.db.Table;
 import ru.innopolis.mputilov.sql.db.TableAliasPair;
 
 @Setter
 @Getter
-public class TableExp implements Expression<Table> {
+public class TableExp implements Exp<Table> {
     protected TableAliasPair tableAliasPair;
     protected Table table;
 

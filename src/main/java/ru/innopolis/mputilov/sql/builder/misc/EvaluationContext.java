@@ -1,9 +1,10 @@
-package ru.innopolis.mputilov.sql.builder;
+package ru.innopolis.mputilov.sql.builder.misc;
 
 import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
-import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.builder.ColumnExp;
+import ru.innopolis.mputilov.sql.builder.ColumnsExp;
 import ru.innopolis.mputilov.sql.db.Table;
 
 import java.util.Map;

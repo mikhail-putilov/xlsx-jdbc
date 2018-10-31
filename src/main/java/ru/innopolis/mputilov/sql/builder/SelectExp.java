@@ -1,7 +1,8 @@
 package ru.innopolis.mputilov.sql.builder;
 
 import lombok.Getter;
-import ru.innopolis.mputilov.sql.builder.vo.ColumnExp;
+import ru.innopolis.mputilov.sql.builder.misc.EvaluationContext;
+import ru.innopolis.mputilov.sql.builder.misc.Visitor;
 import ru.innopolis.mputilov.sql.db.ColumnAliasPair;
 import ru.innopolis.mputilov.sql.db.Table;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-public class SelectExp implements Expression<Table> {
+public class SelectExp implements Exp<Table> {
 
     private ColumnsExp columns;
 

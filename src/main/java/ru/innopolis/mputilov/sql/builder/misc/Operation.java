@@ -1,4 +1,4 @@
-package ru.innopolis.mputilov.sql.builder;
+package ru.innopolis.mputilov.sql.builder.misc;
 
 import java.util.Objects;
 import java.util.function.BiFunction;

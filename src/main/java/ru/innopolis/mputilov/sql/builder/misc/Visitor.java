@@ -1,7 +1,9 @@
-package ru.innopolis.mputilov.sql.builder;
+package ru.innopolis.mputilov.sql.builder.misc;
+
+import ru.innopolis.mputilov.sql.builder.*;
 
 public interface Visitor {
-    void visitJoinEqExpression(JoinEq expression);
+    void visitJoinEqExpression(JoinEqExp expression);
 
     void visitSelectExpression(SelectExp expression);
 
