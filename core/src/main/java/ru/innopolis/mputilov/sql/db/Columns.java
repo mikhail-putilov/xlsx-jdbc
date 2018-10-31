@@ -1,6 +1,7 @@
 package ru.innopolis.mputilov.sql.db;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Columns {
     private final List<ColumnAliasPair> columns;

@@ -1,4 +1,4 @@
 /**
- * Agnostic implementation of simplified SQL API
+ * Agnostic implementation of core algorithms
  */
 package ru.innopolis.mputilov.sql.db;

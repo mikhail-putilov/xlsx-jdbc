@@ -5,8 +5,6 @@ import lombok.Setter;
 import ru.innopolis.mputilov.sql.db.Table;
 import ru.innopolis.mputilov.sql.db.TableAliasPair;
 
-import java.util.function.Supplier;
-
 @Setter
 @Getter
 public class TableExp implements Expression<Table> {
@@ -15,12 +13,6 @@ public class TableExp implements Expression<Table> {
 
     public TableExp(TableAliasPair tableAliasPair) {
         this.tableAliasPair = tableAliasPair;
-    }
-
-    void initTable(Supplier<Table> supplier) {
-        if (table == null) {
-            table = supplier.get();
-        }
     }
 
     @Override

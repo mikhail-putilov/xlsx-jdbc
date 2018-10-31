@@ -1,6 +1,7 @@
 package ru.innopolis.mputilov.sql.db;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -36,24 +37,41 @@ public class Tuple implements Comparable<Tuple> {
         return new Tuple(left, right);
     }
 
-    @SuppressWarnings("NullableProblems")
-    @Override
-    public int compareTo(Tuple o) {
-        for (int i = 0; i < tuple.size(); i++) {
-            //noinspection unchecked
-            int result = ((Comparable<Object>) tuple.get(i)).compareTo(o.getTuple().get(i));
-            if (result != 0) {
-                return result;
-            }
-        }
-        return 0;
-    }
-
     public int size() {
         return tuple.size();
     }
 
     public Object get(int i) {
         return tuple.get(i);
+    }
+
+    Tuple reorder(List<Integer> permutation) {
+        List<Object> orderedData = new ArrayList<>(tuple.size());
+        for (Integer indexInThisTuple : permutation) {
+            orderedData.add(tuple.get(indexInThisTuple));
+        }
+        return new Tuple(orderedData);
+    }
+
+    @Override
+    public int compareTo(@SuppressWarnings("NullableProblems") Tuple other) {
+        //noinspection unchecked
+        CmpSaver cmpSaver = new CmpSaver();
+        // results of anyMatch we don't need to use
+        //noinspection ResultOfMethodCallIgnored,unchecked
+        Streams.zip(this.tuple.stream().map(data -> (Comparable<Object>) data),
+                other.tuple.stream(),
+                Comparable::compareTo)
+                .anyMatch(cmpSaver::isNotNull);
+        return cmpSaver.lastCmp;
+    }
+
+    private static class CmpSaver {
+        Integer lastCmp;
+
+        boolean isNotNull(Integer cmp) {
+            lastCmp = cmp;
+            return cmp != 0;
+        }
     }
 }

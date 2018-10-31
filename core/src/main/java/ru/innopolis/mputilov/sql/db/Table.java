@@ -1,10 +1,8 @@
 package ru.innopolis.mputilov.sql.db;
 
 import com.google.common.base.Joiner;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,24 +11,20 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Getter
-@RequiredArgsConstructor
+@RequiredArgsConstructor(staticName = "createEmpty")
 public class Table {
-    private final String tableName;
-    private final String tableAlias;
-    @Setter
-    private Columns columns;
-    @Getter(AccessLevel.PACKAGE)
+    private final TableHeader header;
     private TreeMap<Tuple, Tuple> hashed = new TreeMap<>();
     private List<Tuple> rawTuples = new ArrayList<>();
 
     public Table(TableAliasPair tableAliasPair) {
-        this.tableName = tableAliasPair.getTableName();
-        this.tableAlias = tableAliasPair.getAlias();
+        this.header = TableHeader.createPartly(tableAliasPair.getTableName(), tableAliasPair.getAlias());
     }
 
-    private boolean isReccurent() {
+    private boolean isRecurrent() {
         // todo
         return false;
     }
@@ -54,25 +48,24 @@ public class Table {
         rawTuples.add(rawTuple);
     }
 
-    private Table probing(Table other, String joinedTableAlias) {
+    private Table probe(Table other, String joinedTableAlias) {
         if (hashed.isEmpty()) {
             throw new IllegalStateException("Cannot join raw tables");
         }
         Map<Tuple, Tuple> small;
         Map<Tuple, Tuple> big;
-        Table joined;
+        TableHeader header;
         boolean isLeftSmall = getHashed().size() < other.getHashed().size();
         if (isLeftSmall) {
             small = getHashed();
             big = other.getHashed();
-            joined = new Table(Joiner.on("_").join("Joined", tableName, other.tableName), joinedTableAlias);
-            joined.columns = columns.combine(other.columns);
+            header = TableHeader.createFully(this.joinTableNames(other), joinedTableAlias, this.joinColumns(other));
         } else {
             small = other.getHashed();
             big = getHashed();
-            joined = new Table(Joiner.on("_").join("Joined", other.tableName, tableName), joinedTableAlias);
-            joined.columns = other.columns.combine(columns);
+            header = TableHeader.createFully(other.joinTableNames(this), joinedTableAlias, other.joinColumns(this));
         }
+        Table joined = Table.createEmpty(header);
         small.forEach((key, smallTuple) -> {
             Tuple bigTuple = big.get(key);
             Tuple joinedTuple = Tuple.of(smallTuple, bigTuple);
@@ -81,16 +74,24 @@ public class Table {
         return joined;
     }
 
+    private Columns joinColumns(Table other) {
+        return header.getColumns().combine(other.getHeader().getColumns());
+    }
+
+    private String joinTableNames(Table other) {
+        return Joiner.on("_").join("Joined", header.getTableName(), other.header.getTableName());
+    }
+
     public ResultSet getResultSet() {
         return new ResultSet(rawTuples);
     }
 
     public Table join(Table rhs, String joinedTableAlias, Function<Tuple, Tuple> lhsKeyExtractor, Function<Tuple, Tuple> rhsKeyExtractor) {
-        if (isReccurent()) {
-            throw new UnsupportedOperationException("cannot join reccurent table " + tableName);
+        if (isRecurrent()) {
+            throw new UnsupportedOperationException("cannot join reccurent table " + header.getTableName());
         }
-        if (rhs.isReccurent()) {
-            throw new UnsupportedOperationException("cannot join reccurent table" + rhs.tableName);
+        if (rhs.isRecurrent()) {
+            throw new UnsupportedOperationException("cannot join reccurent table" + rhs.header.getTableName());
         }
         if (isEmpty()) {
             throw new IllegalStateException("Lhs table is empty, nothing to join");
@@ -108,7 +109,7 @@ public class Table {
         } else {
             throw new IllegalStateException("Rhs table does not have raw tuple to rehash");
         }
-        return this.probing(rhs, joinedTableAlias);
+        return this.probe(rhs, joinedTableAlias);
     }
 
     private void rehash(Function<Tuple, Tuple> keyExtractor) {
@@ -124,5 +125,43 @@ public class Table {
         } else {
             rawTuples.removeIf(predicate);
         }
+    }
+
+    public Table reorder(List<ColumnAliasPair> desiredOrder) {
+        return reorderAll(desiredOrder.stream()
+                .map(header.getColumns()::getIndexOf) // get the position of column A in a given order argument
+                .collect(Collectors.toList()));
+    }
+
+    /**
+     * Given unordered tuple:
+     * <pre>
+     *      0 1 2
+     *      | | |
+     *      v v v
+     * A = [b a c]
+     * </pre>
+     * and desirable order:
+     * <pre>
+     *      0 1 2
+     *      | | |
+     *      v v v
+     * D = [a b c]
+     * </pre>
+     * permutation matrix maps D'th indexes to indexes in A
+     * So, permutation would be in that example:
+     * <pre>
+     *      0 1 2
+     *      | | |
+     *      v v v
+     * P = [1 0 2]
+     * </pre>
+     */
+    private Table reorderAll(List<Integer> permutationMatrix) {
+        Table table = new Table(header);
+        for (Tuple t : getRawTuples()) {
+            table.addRawTuple(t.reorder(permutationMatrix));
+        }
+        return table;
     }
 }

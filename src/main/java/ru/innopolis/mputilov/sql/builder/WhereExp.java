@@ -19,12 +19,12 @@ public class WhereExp implements Expression<Table> {
     private Function<Tuple, Tuple> rhsKeyExtractor;
 
     void createLhsKeyExtractor(Table lhs) {
-        int indexOfLhsColumn = lhs.getColumns().getIndexOf(lhsColumnExp.toColumnAliasPair());
+        int indexOfLhsColumn = lhs.getHeader().getColumns().getIndexOf(lhsColumnExp.toColumnAliasPair());
         lhsKeyExtractor = list -> Tuple.of(list.get(indexOfLhsColumn));
     }
 
     void createRhsKeyExtractor(Table rhs) {
-        int indexOfRhsColumn = rhs.getColumns().getIndexOf(rhsColumnExp.toColumnAliasPair());
+        int indexOfRhsColumn = rhs.getHeader().getColumns().getIndexOf(rhsColumnExp.toColumnAliasPair());
         rhsKeyExtractor = list -> Tuple.of(list.get(indexOfRhsColumn));
     }
 
